@@ -1,0 +1,24 @@
+<mujoco model="003_cracker_box">
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <texture type="2d" name="texture_map" file="texture_map.png"/>
+    <material name="material_0" texture="texture_map" specular="0.5" shininess="0.5"/>
+    <mesh file="003_cracker_box.obj"/>
+    <mesh file="003_cracker_box_collision_0.obj"/>
+    <mesh file="003_cracker_box_collision_1.obj"/>
+  </asset>
+  <worldbody>
+    <body name="003_cracker_box">
+      <geom material="material_0" mesh="003_cracker_box" class="visual" mass="0.411"/>
+      <geom mesh="003_cracker_box_collision_0" rgba="0.24910084134453225 0.9291914559901291 0.6519096107112041 1" class="collision"/>
+      <geom mesh="003_cracker_box_collision_1" rgba="0.5418364141387485 0.39192333775571686 0.25200063707229703 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>

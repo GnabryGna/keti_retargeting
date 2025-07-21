@@ -1,0 +1,13 @@
+<mujoco model="robot_torso">
+  <compiler meshdir="assets"/>
+
+  <asset>
+    <mesh file="robot_torso.stl"/>
+  </asset>
+
+  <worldbody>
+    <body name="robot_torso">
+        <geom type="mesh" mesh="robot_torso"/>
+    </body>
+  </worldbody>
+</mujoco>
