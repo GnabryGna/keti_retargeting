@@ -94,21 +94,72 @@ if __name__ == '__main__':
     # Barcode scanner
     barcode_scanner_xml_path = os.path.join(os.getcwd(), 'barcode_scanner', 'barcode_scanner.xml')
     barcode_scanner = mjcf.from_path(barcode_scanner_xml_path)
+    barcode_scanner.default.geom.priority = 1
+    barcode_scanner.default.geom.condim = 6
     barcode_scanner_attachment_frame = scene.attach(barcode_scanner)
     barcode_scanner_attachment_frame.add('freejoint')
-    barcode_scanner_attachment_frame.pos = [0.5, 0.45, 0.2]
+    barcode_scanner_attachment_frame.pos = [0.45, 0.5, 0.2]
     barcode_scanner_attachment_frame.euler = [np.pi, 0, -np.pi/2]
 
+    # Box
+    box_width = 0.34
+    box_length = 0.25
+    box_height = 0.205 # 실제 높이는 0.21 (box_height + box_thickness)
+    box_thickness = 0.005
+    box_rgba = [0.7, 0.6, 0.4, 1]
+    box = scene.worldbody.add('body',
+                              name='box',
+                              pos=[0.2 + 0.17, -0.36 - 0.125, 0])
+    box.add('geom',
+            name='base',
+            type='box',
+            rgba=box_rgba,
+            size=[box_width/2, box_length/2, box_thickness/2],
+            pos=[0, 0, box_thickness/2])
+    box.add('geom',
+            name='side_1',
+            type='box',
+            rgba=box_rgba,
+            size=[box_thickness/2, box_length/2, box_height/2],
+            pos=[box_width/2 - box_thickness/2, 0, box_height/2 + box_thickness])
+    box.add('geom',
+            name='side_2',
+            type='box',
+            rgba=box_rgba,
+            size=[box_width/2 - box_thickness, box_thickness/2, box_height/2],
+            pos=[0, -box_length/2 + box_thickness/2, box_height/2 + box_thickness])
+    box.add('geom',
+            name='side_3',
+            type='box',
+            rgba=box_rgba,
+            size=[box_thickness/2, box_length/2, box_height/2],
+            pos=[-box_width/2 + box_thickness/2, 0, box_height/2 + box_thickness])
+    box.add('geom',
+            name='side_4',
+            type='box',
+            rgba=box_rgba,
+            size=[box_width/2 - box_thickness, box_thickness/2, box_height/2],
+            pos=[0, box_length/2 - box_thickness/2, box_height/2 + box_thickness])
+    
+    # Object grasping area
+    grasping_area = scene.worldbody.add('site',
+                                        name='grasping_area',
+                                        type='box',
+                                        group=4,
+                                        rgba=[0, 1, 0, 1],
+                                        size=[0.17, 0.36, 0.001],
+                                        pos=[0.2 + 0.17, 0, 0])
+
     # Object
-    ycb_object_init_pose = [ # [x, y, z, roll, pitch, yaw] relative to world fram
-        [0.3, 0, 0.2, 0, 0, 0], # 003_cracker_box
-        [0.3, 0.2, 0.2, 0, 0, 0], # 004_sugar_box
-        [0.4, 0, 0.2, 0, 0, 0], # 005_tomato_soup_can
-        [0.4, 0.2, 0.2, 0, 0, 0], # 006_mustard_bottle
-        [0.5, 0, 0.2, np.pi/2, 0, 0], # 010_potted_meat_can
-        [0.5, 0.2, 0.2, 0, 0, 0] # 021_bleach_cleanser
+    ycb_object_init_pose = [ # [x, y, z, roll, pitch, yaw] relative to world frame
+        [0.25, -0.1, 0.2, 0, 0, 0], # 003_cracker_box
+        [0.25, 0.1, 0.2, 0, 0, 0], # 004_sugar_box
+        [0.35, -0.1, 0.2, 0, 0, 0], # 005_tomato_soup_can
+        [0.35, 0.1, 0.2, 0, 0, 0], # 006_mustard_bottle
+        [0.45, -0.1, 0.2, np.pi/2, 0, 0], # 010_potted_meat_can
+        [0.45, 0.1, 0.2, 0, 0, 0] # 021_bleach_cleanser
     ]
-    ycb_object_barcode_pose = [ # [x, y, z, roll, pitch, yaw] relative to body fram
+    ycb_object_barcode_pose = [ # [x, y, z, roll, pitch, yaw] relative to body frame
         [-0.010259, 0.050995, -0.10498, np.pi, 0, -np.pi/2], # 003_cracker_box
         [0.004512, 0.025381, -0.085659, np.pi, 0, -np.pi/2], # 004_sugar_box
         [-0.025168, -0.023411, -0.028418, np.pi/2, -np.pi/4, 0], # 005_tomato_soup_can
@@ -143,46 +194,6 @@ if __name__ == '__main__':
         ycb_object_attachment_frame.add('freejoint')
         ycb_object_attachment_frame.pos = ycb_object_init_pose[id][:3]
         ycb_object_attachment_frame.euler = ycb_object_init_pose[id][3:]
-
-    # Box
-    box_width = 0.34
-    box_length = 0.25
-    box_height = 0.205 # 실제 높이는 0.21 (box_height + box_thickness)
-    box_thickness = 0.005
-    box_rgba = [0.7, 0.6, 0.4, 1]
-    box = scene.worldbody.add('body',
-                              name='box',
-                              pos=[0.4, -0.3, 0])
-    box.add('geom',
-            name='base',
-            type='box',
-            rgba=box_rgba,
-            size=[box_width/2, box_length/2, box_thickness/2],
-            pos=[0, 0, box_thickness/2])
-    box.add('geom',
-            name='side_1',
-            type='box',
-            rgba=box_rgba,
-            size=[box_thickness/2, box_length/2, box_height/2],
-            pos=[box_width/2 - box_thickness/2, 0, box_height/2 + box_thickness])
-    box.add('geom',
-            name='side_2',
-            type='box',
-            rgba=box_rgba,
-            size=[box_width/2 - box_thickness, box_thickness/2, box_height/2],
-            pos=[0, -box_length/2 + box_thickness/2, box_height/2 + box_thickness])
-    box.add('geom',
-            name='side_3',
-            type='box',
-            rgba=box_rgba,
-            size=[box_thickness/2, box_length/2, box_height/2],
-            pos=[-box_width/2 + box_thickness/2, 0, box_height/2 + box_thickness])
-    box.add('geom',
-            name='side_4',
-            type='box',
-            rgba=box_rgba,
-            size=[box_width/2 - box_thickness, box_thickness/2, box_height/2],
-            pos=[0, box_length/2 - box_thickness/2, box_height/2 + box_thickness])
     
     # Option
     scene.option.integrator = 'implicitfast'
