@@ -187,7 +187,7 @@ if __name__ == '__main__':
         ycb_object.default.geom.condim = 6
         ycb_object.default.geom.priority = 1
         # TODO: need to adjust
-        ycb_object.default.geom.solimp = [1, 1, 0.001, 0.5, 2] # default: [0.9, 0.95, 0.001, 0.5, 2]
+        # ycb_object.default.geom.solimp = [1, 1, 0.001, 0.5, 2] # default: [0.9, 0.95, 0.001, 0.5, 2]
         
         # Add barcode site
         ycb_object_body = ycb_object.find('body', f'{ycb_object_name}')
@@ -213,7 +213,7 @@ if __name__ == '__main__':
     # Option
     scene.option.integrator = 'implicitfast'
     scene.option.cone = 'elliptic'
-    scene.option.flag.multiccd = 'enable'
+    # scene.option.flag.multiccd = 'enable'
     scene.compiler.inertiagrouprange = [0, 2]
     
     # Initial state (allegro)
@@ -237,3 +237,11 @@ if __name__ == '__main__':
 
     mjcf.export_with_assets(mjcf_model=scene, out_dir= os.path.join(os.getcwd(), 'output'))
     print('Complete')
+
+
+    # physics = mjcf.Physics.from_mjcf_model(scene)
+    # geom_id = physics.model.name2id('xarm7_left/allegro_left//unnamed_geom_20', 'geom')
+    # geom_size = physics.model.geom_size[geom_id]
+    # print(f'geom_size: {geom_size}')
+
+    
