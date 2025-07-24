@@ -69,6 +69,10 @@
         </default>
       </default>
 
+      <default class="touch_sensor">
+        <site type="ellipsoid" group="4" rgba="1 0 0 1" size="0.004 0.010 0.014" pos="0.018 0 0.031"/>
+      </default>
+
       <default class="base">
         <joint axis="0 0 1" range="-0.47 0.47"/>
         <position ctrlrange="-0.47 0.47"/>
@@ -145,6 +149,7 @@
               <body name="ff_tip">
                 <geom class="fingertip_visual"/>
                 <geom class="fingertip_collision"/>
+                <site name="ff_tip" class="touch_sensor"/>
               </body>
             </body>
           </body>
@@ -170,6 +175,7 @@
               <body name="mf_tip">
                 <geom class="fingertip_visual"/>
                 <geom class="fingertip_collision"/>
+                <site name="mf_tip" class="touch_sensor"/>
               </body>
             </body>
           </body>
@@ -195,6 +201,7 @@
               <body name="rf_tip">
                 <geom class="fingertip_visual"/>
                 <geom class="fingertip_collision"/>
+                <site name="rf_tip" class="touch_sensor"/>
               </body>
             </body>
           </body>
@@ -220,6 +227,7 @@
               <body name="th_tip">
                 <geom class="thumbtip_visual"/>
                 <geom class="thumbtip_collision"/>
+                <site name="th_tip" class="touch_sensor" pos="0.018 0 0.046"/>
               </body>
             </body>
           </body>
@@ -254,4 +262,11 @@
     <position name="tha2" joint="thj2" class="thumb_medial"/>
     <position name="tha3" joint="thj3" class="thumb_distal"/>
   </actuator>
+
+  <sensor>
+    <touch site="th_tip" name="th_tip"/>
+    <touch site="ff_tip" name="ff_tip"/>
+    <touch site="mf_tip" name="nf_tip"/>
+    <touch site="rf_tip" name="rf_tip"/>    
+  </sensor>
 </mujoco>

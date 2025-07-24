@@ -92,7 +92,7 @@ if __name__ == '__main__':
     # Barcode scanner
     barcode_scanner_xml_path = os.path.join(os.getcwd(), 'barcode_scanner', 'barcode_scanner.xml')
     barcode_scanner = mjcf.from_path(barcode_scanner_xml_path)
-    barcode_scanner.default.mesh.inertia = 'exact'
+    # barcode_scanner.default.mesh.inertia = 'exact'
     barcode_scanner.default.geom.condim = 6
     barcode_scanner.default.geom.priority = 1
     barcode_scanner_attachment_frame = scene.attach(barcode_scanner)
@@ -183,7 +183,7 @@ if __name__ == '__main__':
         xml_file_name = [file_name for file_name in file_names if file_name.lower().endswith('.xml')][0]
         ycb_object_xml_path = os.path.join(ycb_object_file_dir, ycb_object_name, xml_file_name)
         ycb_object = mjcf.from_path(ycb_object_xml_path)
-        ycb_object.default.mesh.inertia = 'exact'
+        # ycb_object.default.mesh.inertia = 'exact'
         ycb_object.default.geom.condim = 6
         ycb_object.default.geom.priority = 1
         # TODO: need to adjust
@@ -237,11 +237,3 @@ if __name__ == '__main__':
 
     mjcf.export_with_assets(mjcf_model=scene, out_dir= os.path.join(os.getcwd(), 'output'))
     print('Complete')
-
-
-    # physics = mjcf.Physics.from_mjcf_model(scene)
-    # geom_id = physics.model.name2id('xarm7_left/allegro_left//unnamed_geom_20', 'geom')
-    # geom_size = physics.model.geom_size[geom_id]
-    # print(f'geom_size: {geom_size}')
-
-    
