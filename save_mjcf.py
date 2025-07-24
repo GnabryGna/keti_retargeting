@@ -15,7 +15,6 @@ if __name__ == '__main__':
     table = mjcf.from_path(table_xml_path)
     table.default.geom.rgba = [1, 1, 1, 1]
     table_attachment_frame = scene.attach(table)
-    # table_attachment_frame.euler = [0, 0, np.pi/2]
 
     # Robot torso
     robot_torso_xml_path = os.path.join(os.getcwd(), 'robot_torso', 'robot_torso.xml')
@@ -93,15 +92,14 @@ if __name__ == '__main__':
     # Barcode scanner
     barcode_scanner_xml_path = os.path.join(os.getcwd(), 'barcode_scanner', 'barcode_scanner.xml')
     barcode_scanner = mjcf.from_path(barcode_scanner_xml_path)
+    barcode_scanner.default.mesh.scale = [0.001, 0.001, 0.001]
     # barcode_scanner.default.mesh.inertia = 'exact'
     barcode_scanner.default.geom.condim = 6
     barcode_scanner.default.geom.priority = 1
     barcode_scanner_attachment_frame = scene.attach(barcode_scanner)
     barcode_scanner_attachment_frame.add('freejoint')
-
-    barcode_scanner_init_pose = [-0.5, 0.45, 0.2, np.pi, 0, np.pi]
-    barcode_scanner_attachment_frame.pos = barcode_scanner_init_pose[:3]
-    barcode_scanner_attachment_frame.euler = barcode_scanner_init_pose[3:]
+    barcode_scanner_attachment_frame.pos = [-0.5, 0.45, 0.2]
+    barcode_scanner_attachment_frame.euler = [np.pi, 0, np.pi]
 
     # Object grasping area
     grasping_area_width = 0.34

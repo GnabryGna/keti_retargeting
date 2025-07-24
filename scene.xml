@@ -1,6 +1,6 @@
 <mujoco model="scene">
 
-  <statistic center="0 0 0.1" extent="1.2"/>
+  <statistic center="0 0 0.1" extent="1.1"/>
 
   <visual>
     <headlight diffuse="0.6 0.6 0.6" ambient="0.1 0.1 0.1" specular="0 0 0"/>
