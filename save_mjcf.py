@@ -15,6 +15,7 @@ if __name__ == '__main__':
     table = mjcf.from_path(table_xml_path)
     table.default.geom.rgba = [1, 1, 1, 1]
     table_attachment_frame = scene.attach(table)
+    # table_attachment_frame.euler = [0, 0, np.pi/2]
 
     # Robot torso
     robot_torso_xml_path = os.path.join(os.getcwd(), 'robot_torso', 'robot_torso.xml')
@@ -27,15 +28,15 @@ if __name__ == '__main__':
     left_robot_arm = mjcf.from_path(robot_xml_path)
     left_robot_arm.model = 'xarm7_left'
     left_robot_arm_attachment_frame = scene.attach(left_robot_arm)
-    left_robot_arm_attachment_frame.pos = [0, 0.05692, 0.44761]
-    left_robot_arm_attachment_frame.euler = [-np.pi*5/9, 0, 0]
+    left_robot_arm_attachment_frame.pos = [-0.05692, 0, 0.44761]
+    left_robot_arm_attachment_frame.quat = transformations.euler_to_quat([np.pi/2, 0, -np.pi*5/9], ordering='ZYX')
 
     # Right robot arm (xarm7)
     right_robot_arm = mjcf.from_path(robot_xml_path)
     right_robot_arm.model = 'xarm7_right'
     right_robot_arm_attachment_frame = scene.attach(right_robot_arm)
-    right_robot_arm_attachment_frame.pos = [0, -0.05692, 0.44761]
-    right_robot_arm_attachment_frame.euler = [np.pi*5/9, 0, 0]
+    right_robot_arm_attachment_frame.pos = [0.05692, 0, 0.44761]
+    right_robot_arm_attachment_frame.quat = transformations.euler_to_quat([np.pi/2, 0, np.pi*5/9], ordering='ZYX')
 
     # # Left robot hand (inspire)
     # left_robot_hand_xml_path = os.path.join(os.getcwd(), 'inspire_robots_rh56dftp_left', 'rh56dftp_left.xml')
@@ -97,18 +98,31 @@ if __name__ == '__main__':
     barcode_scanner.default.geom.priority = 1
     barcode_scanner_attachment_frame = scene.attach(barcode_scanner)
     barcode_scanner_attachment_frame.add('freejoint')
-    barcode_scanner_attachment_frame.pos = [0.45, 0.5, 0.2]
-    barcode_scanner_attachment_frame.euler = [np.pi, 0, -np.pi/2]
+
+    barcode_scanner_init_pose = [-0.5, 0.45, 0.2, np.pi, 0, np.pi]
+    barcode_scanner_attachment_frame.pos = barcode_scanner_init_pose[:3]
+    barcode_scanner_attachment_frame.euler = barcode_scanner_init_pose[3:]
+
+    # Object grasping area
+    grasping_area_width = 0.34
+    grasping_area_length = 0.72
+    grasping_area = scene.worldbody.add('site',
+                                        name='grasping_area',
+                                        type='box',
+                                        group=4,
+                                        rgba=[0, 1, 0, 1],
+                                        size=[grasping_area_length/2, grasping_area_width/2, 0.001],
+                                        pos=[0, 0.2 + grasping_area_width/2, 0])
 
     # Box
-    box_width = 0.34
-    box_length = 0.25
+    box_width = 0.25
+    box_length = 0.34
     box_height = 0.205 # 실제 높이는 0.21 (box_height + box_thickness)
     box_thickness = 0.005
     box_rgba = [0.7, 0.6, 0.4, 1]
     box = scene.worldbody.add('body',
                               name='box',
-                              pos=[0.2 + 0.17, -0.36 - 0.125, 0])
+                              pos=[0.36 + 0.125, 0.2 + 0.17, 0])
     box.add('geom',
             name='base',
             type='box',
@@ -139,24 +153,15 @@ if __name__ == '__main__':
             rgba=box_rgba,
             size=[box_width/2 - box_thickness, box_thickness/2, box_height/2],
             pos=[0, box_length/2 - box_thickness/2, box_height/2 + box_thickness])
-    
-    # Object grasping area
-    grasping_area = scene.worldbody.add('site',
-                                        name='grasping_area',
-                                        type='box',
-                                        group=4,
-                                        rgba=[0, 1, 0, 1],
-                                        size=[0.17, 0.36, 0.001],
-                                        pos=[0.2 + 0.17, 0, 0])
 
     # Object
     ycb_object_init_pose = [ # [x, y, z, roll, pitch, yaw] relative to world frame
-        [0.25, -0.1, 0.2, 0, 0, 0], # 003_cracker_box
-        [0.25, 0.1, 0.2, 0, 0, 0], # 004_sugar_box
-        [0.35, -0.1, 0.2, 0, 0, 0], # 005_tomato_soup_can
-        [0.35, 0.1, 0.2, 0, 0, 0], # 006_mustard_bottle
-        [0.45, -0.1, 0.2, np.pi/2, 0, 0], # 010_potted_meat_can
-        [0.45, 0.1, 0.2, 0, 0, 0] # 021_bleach_cleanser
+        [0.1, 0.25, 0.1, 0, 0, np.pi/2], # 003_cracker_box
+        [-0.1, 0.25, 0.1, 0, 0, np.pi/2], # 004_sugar_box
+        [0.1, 0.35, 0.1, 0, 0, np.pi/2], # 005_tomato_soup_can
+        [-0.1, 0.35, 0.1, 0, 0, np.pi/2], # 006_mustard_bottle
+        [0.1, 0.45, 0.1, np.pi/2, np.pi/2, 0], # 010_potted_meat_can
+        [-0.1, 0.45, 0.1, 0, 0, -np.pi/2] # 021_bleach_cleanser
     ]
     ycb_object_barcode_pose = [ # [x, y, z, roll, pitch, yaw] relative to body frame
         [-0.010259, 0.050995, -0.10498, np.pi, 0, -np.pi/2], # 003_cracker_box
@@ -225,7 +230,7 @@ if __name__ == '__main__':
         + [0, 1.6, 1.3, 0.5, 0, 1.6, 1.3, 0.5, 0, 1.6, 1.3, 0.5, 0, 1.1, 1.1, 0.5] # left hand
         + [0, 0, 0, np.pi/6, -np.pi, 0, np.pi] # right arm
         + [0]*16 # right hand
-        + [0.45, 0.18, 0.48] + transformations.euler_to_quat([np.pi/2, np.pi/6, 0]).tolist() # barcode scanner
+        + [-0.18, 0.45, 0.48] + transformations.euler_to_quat([np.pi/2, np.pi*2/3, 0]).tolist() # barcode scanner
         + ycb_object_init_pose[0][:3] + transformations.euler_to_quat(ycb_object_init_pose[0][3:]).tolist() # 003_cracker_box
         + ycb_object_init_pose[1][:3] + transformations.euler_to_quat(ycb_object_init_pose[1][3:]).tolist() # 004_sugar_box
         + ycb_object_init_pose[2][:3] + transformations.euler_to_quat(ycb_object_init_pose[2][3:]).tolist() # 005_tomato_soup_can
