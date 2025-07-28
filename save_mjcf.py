@@ -167,7 +167,7 @@ if __name__ == '__main__':
         [-0.025168, -0.023411, -0.028418, np.pi/2, -np.pi/4, 0], # 005_tomato_soup_can
         [-0.026312, -0.000525, -0.043586, 0, -np.pi/2, -np.pi/2], # 006_mustard_bottle
         [-0.00522, 0.005731, 0.047954, 0, 0, np.pi/2], # 010_potted_meat_can
-        [0.031735, 0.01317, -0.073959, -np.pi/90, 0, 0] # 021_bleach_cleanser
+        [0.031735, 0.01317, -0.073959, 0, np.pi/2, np.pi*88/180] # 021_bleach_cleanser
     ]
     # ycb_object_mass = [0.411, 0.514, 0.349, 0.603, 0.37, 1.131]
     # ycb_object_inertia_matrix = [ # [xx, yy, zz, xy, xz, yz]
