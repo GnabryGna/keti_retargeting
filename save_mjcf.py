@@ -201,7 +201,8 @@ if __name__ == '__main__':
     # Option
     scene.option.integrator = 'implicit'
     scene.option.cone = 'elliptic'
-    # scene.option.flag.multiccd = 'enable'
+    # scene.option.jacobian = 'dense'
+    scene.option.flag.multiccd = 'enable'
     scene.compiler.inertiagrouprange = [0, 2]
     
     # Initial state (allegro)

@@ -121,7 +121,7 @@
     <mesh file="link_13.0.stl"/>
     <mesh file="link_14.0.stl"/>
     <mesh file="link_15.0.stl"/>
-    <mesh file="digit.stl"/>
+    <mesh file="digit.obj"/>
   </asset>
 
   <worldbody>
