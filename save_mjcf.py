@@ -169,16 +169,7 @@ if __name__ == '__main__':
         [-0.00522, 0.005731, 0.047954, 0, 0, np.pi/2], # 010_potted_meat_can
         [0.031735, 0.01317, -0.073959, 0, np.pi/2, np.pi*88/180] # 021_bleach_cleanser
     ]
-    # ycb_object_mass = [0.411, 0.514, 0.349, 0.603, 0.37, 1.131]
-    # ycb_object_inertia_matrix = [ # [xx, yy, zz, xy, xz, yz]
-    #     [5.8284476667e-03, 4.0928755029e-03, 2.4318893100e-03, -1.2156971874e-06, 3.7193151667e-05, 1.3268114999e-05],
-    #     [3.1530279732e-03, 2.6445788540e-03, 7.9379902551e-04, -1.8465066361e-05, 9.3739782990e-05, -3.1919166191e-05],
-    #     [1.0026548160e-03, 1.0105218561e-03, 5.4967554550e-04, -4.1885969743e-07,  -2.3207722080e-06, 1.0153299346e-06],
-    #     [2.4304633618e-03, 2.6748587639e-03, 7.0151123676e-04, 1.2578583989e-04,  -8.2488738081e-06, -1.1690060534e-05],
-    #     [7.0538916484e-04, 1.2091032282e-03, 9.1157704910e-04, -2.7839777344e-05, -1.5531186341e-06, 3.1372827657e-06],
-    #     [4.3546483321e-03, 4.6959742842e-03, 8.0486867445e-04, 3.5311987973e-06, -2.5203014495e-04, 2.1901421083e-06]
-    # ]
-    
+
     ycb_object_file_dir = os.path.join(os.getcwd(), 'ycb')
     ycb_object_name_list = os.listdir(ycb_object_file_dir)
     for id, ycb_object_name in enumerate(ycb_object_name_list):
@@ -201,12 +192,6 @@ if __name__ == '__main__':
                             rgba=[1, 0, 0, 1],
                             pos=ycb_object_barcode_pose[id][:3],
                             euler=ycb_object_barcode_pose[id][3:])
-        
-        # Set mass and inertia
-        # ycb_object_body.add('inertial',
-        #                     pos=[0, 0, 0],
-        #                     mass=ycb_object_mass[id],
-        #                     fullinertia=ycb_object_inertia_matrix[id])
 
         ycb_object_attachment_frame = scene.attach(ycb_object)
         ycb_object_attachment_frame.add('freejoint')
@@ -214,7 +199,7 @@ if __name__ == '__main__':
         ycb_object_attachment_frame.euler = ycb_object_init_pose[id][3:]
 
     # Option
-    scene.option.integrator = 'implicitfast'
+    scene.option.integrator = 'implicit'
     scene.option.cone = 'elliptic'
     # scene.option.flag.multiccd = 'enable'
     scene.compiler.inertiagrouprange = [0, 2]
