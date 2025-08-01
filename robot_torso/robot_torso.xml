@@ -1,13 +1,45 @@
 <mujoco model="robot_torso">
   <compiler meshdir="assets"/>
-
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
   <asset>
-    <mesh file="robot_torso.stl"/>
+    <mesh file="robot_torso.obj"/>
+    <mesh file="robot_torso_collision_0.obj"/>
+    <mesh file="robot_torso_collision_1.obj"/>
+    <mesh file="robot_torso_collision_2.obj"/>
+    <mesh file="robot_torso_collision_3.obj"/>
+    <mesh file="robot_torso_collision_4.obj"/>
+    <mesh file="robot_torso_collision_5.obj"/>
+    <mesh file="robot_torso_collision_6.obj"/>
+    <mesh file="robot_torso_collision_7.obj"/>
+    <mesh file="robot_torso_collision_8.obj"/>
+    <mesh file="robot_torso_collision_9.obj"/>
+    <mesh file="robot_torso_collision_10.obj"/>
+    <mesh file="robot_torso_collision_11.obj"/>
+    <mesh file="robot_torso_collision_12.obj"/>
   </asset>
-
   <worldbody>
     <body name="robot_torso">
-        <geom type="mesh" mesh="robot_torso"/>
+      <geom mesh="robot_torso" class="visual"/>
+      <geom mesh="robot_torso_collision_0" rgba="0.8103332942861998 0.7481487387682506 0.8892550295065081 1" class="collision"/>
+      <geom mesh="robot_torso_collision_1" rgba="0.42501763116778013 0.9927101710382816 0.6068340743022467 1" class="collision"/>
+      <geom mesh="robot_torso_collision_2" rgba="0.05180378066866642 0.6382212889967489 0.2816548239377977 1" class="collision"/>
+      <geom mesh="robot_torso_collision_3" rgba="0.29538159865575575 0.5280771911740632 0.035624837349799265 1" class="collision"/>
+      <geom mesh="robot_torso_collision_4" rgba="0.41873327459518805 0.17602990595939094 0.9935237827752832 1" class="collision"/>
+      <geom mesh="robot_torso_collision_5" rgba="0.17976283839746876 0.906532457216316 0.07826303234573417 1" class="collision"/>
+      <geom mesh="robot_torso_collision_6" rgba="0.4150315528439791 0.7167348131233686 0.18585097634253822 1" class="collision"/>
+      <geom mesh="robot_torso_collision_7" rgba="0.3688237486102901 0.6435851892788423 0.8153547383966251 1" class="collision"/>
+      <geom mesh="robot_torso_collision_8" rgba="0.7628565684050346 0.817607909182518 0.8673471919797455 1" class="collision"/>
+      <geom mesh="robot_torso_collision_9" rgba="0.5863673121198987 0.06705724673963354 0.0518192476862277 1" class="collision"/>
+      <geom mesh="robot_torso_collision_10" rgba="0.8581215979610125 0.6496501116041294 0.9332185652394698 1" class="collision"/>
+      <geom mesh="robot_torso_collision_11" rgba="0.5619554818170358 0.8115604942794454 0.37711905168900417 1" class="collision"/>
+      <geom mesh="robot_torso_collision_12" rgba="0.5819459390784728 0.3821724604746257 0.8825198359571682 1" class="collision"/>
     </body>
   </worldbody>
 </mujoco>
