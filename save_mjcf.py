@@ -154,12 +154,12 @@ if __name__ == '__main__':
 
     # Object
     ycb_object_init_pose = [ # [x, y, z, roll, pitch, yaw] relative to world frame
-        [0.1, 0.25, 0.1, 0, 0, np.pi/2], # 003_cracker_box
-        [-0.1, 0.25, 0.1, 0, 0, np.pi/2], # 004_sugar_box
-        [0.1, 0.35, 0.1, 0, 0, np.pi/2], # 005_tomato_soup_can
-        [-0.1, 0.35, 0.1, 0, 0, np.pi/2], # 006_mustard_bottle
-        [0.1, 0.45, 0.1, np.pi/2, np.pi/2, 0], # 010_potted_meat_can
-        [-0.1, 0.45, 0.1, 0, 0, -np.pi/2] # 021_bleach_cleanser
+        [0.1, 0.25, 0.12, 0, 0, np.pi/2], # 003_cracker_box
+        [-0.1, 0.25, 0.12, 0, 0, np.pi/2], # 004_sugar_box
+        [0.1, 0.35, 0.12, 0, 0, np.pi/2], # 005_tomato_soup_can
+        [-0.1, 0.35, 0.12, 0, 0, np.pi/2], # 006_mustard_bottle
+        [0.1, 0.45, 0.12, np.pi/2, np.pi/2, 0], # 010_potted_meat_can
+        [-0.1, 0.45, 0.12, 0, 0, -np.pi/2] # 021_bleach_cleanser
     ]
     ycb_object_barcode_pose = [ # [x, y, z, roll, pitch, yaw] relative to body frame
         [-0.010259, 0.050995, -0.10498, np.pi, 0, -np.pi/2], # 003_cracker_box
@@ -180,13 +180,11 @@ if __name__ == '__main__':
         # ycb_object.default.mesh.inertia = 'exact'
         ycb_object.default.geom.condim = 6
         ycb_object.default.geom.priority = 1
-        # TODO: need to adjust
-        # ycb_object.default.geom.solimp = [1, 1, 0.001, 0.5, 2] # default: [0.9, 0.95, 0.001, 0.5, 2]
         
         # Add barcode site
         ycb_object_body = ycb_object.find('body', f'{ycb_object_name}')
         ycb_object_body.add('site',
-                            name='barcode',
+                            name='barcode', 
                             group=4,
                             size=[0.005],
                             rgba=[1, 0, 0, 1],
@@ -199,9 +197,10 @@ if __name__ == '__main__':
         ycb_object_attachment_frame.euler = ycb_object_init_pose[id][3:]
 
     # Option
+    scene.option.o_solref = [0.002, 1] # TODO: need to adjust
     scene.option.integrator = 'implicit'
     scene.option.cone = 'elliptic'
-    # scene.option.jacobian = 'dense'
+    scene.option.flag.override = 'enable'
     scene.option.flag.multiccd = 'enable'
     scene.compiler.inertiagrouprange = [0, 2]
     
@@ -210,11 +209,10 @@ if __name__ == '__main__':
     initial_state.name = 'initial_state'
     initial_state.qpos = (
         [-np.pi, 0, -np.pi, np.pi/6, 0, 0, 0,] # left arm
-        # + [0]*16 # left hand
         + [0, 1.6, 1.3, 0.5, 0, 1.6, 1.3, 0.5, 0, 1.6, 1.3, 0.5, 0, 1.1, 1.1, 0.5] # left hand
         + [0, 0, 0, np.pi/6, -np.pi, 0, np.pi] # right arm
         + [0]*16 # right hand
-        + [-0.18, 0.45, 0.48] + transformations.euler_to_quat([np.pi/2, np.pi*2/3, 0]).tolist() # barcode scanner
+        + [-0.18, 0.45, 0.49, 0.410932, 0.312626, 0.60471, 0.606404] # barcode scanner
         + ycb_object_init_pose[0][:3] + transformations.euler_to_quat(ycb_object_init_pose[0][3:]).tolist() # 003_cracker_box
         + ycb_object_init_pose[1][:3] + transformations.euler_to_quat(ycb_object_init_pose[1][3:]).tolist() # 004_sugar_box
         + ycb_object_init_pose[2][:3] + transformations.euler_to_quat(ycb_object_init_pose[2][3:]).tolist() # 005_tomato_soup_can
