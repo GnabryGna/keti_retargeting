@@ -1,4 +1,5 @@
 <mujoco model="010_potted_meat_can">
+  <compiler meshdir="assets" texturedir="assets"/>
   <default>
     <default class="visual">
       <geom group="2" type="mesh" contype="0" conaffinity="0"/>

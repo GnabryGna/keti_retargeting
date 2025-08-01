@@ -1,4 +1,5 @@
 <mujoco model="005_tomato_soup_can">
+  <compiler meshdir="assets" texturedir="assets"/>
   <default>
     <default class="visual">
       <geom group="2" type="mesh" contype="0" conaffinity="0"/>

@@ -197,7 +197,8 @@ if __name__ == '__main__':
         ycb_object_attachment_frame.euler = ycb_object_init_pose[id][3:]
 
     # Option
-    scene.option.o_solref = [0.002, 1] # TODO: need to adjust
+    scene.option.timestep= 0.001
+    scene.option.o_solref = [0.002, 1]
     scene.option.integrator = 'implicit'
     scene.option.cone = 'elliptic'
     scene.option.flag.override = 'enable'
