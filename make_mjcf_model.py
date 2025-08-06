@@ -1,0 +1,206 @@
+import os
+
+import mujoco
+from dm_control.utils import transformations
+from mujoco import viewer
+
+
+if __name__ == '__main__':
+    # Scene
+    scene_xml_path = os.path.join(os.getcwd(), 'scene.xml')
+    scene = mujoco.MjSpec.from_file(scene_xml_path)
+    attachment_frame = scene.worldbody.add_frame()
+
+    # Table
+    table_xml_path = os.path.join(os.getcwd(), 'table', 'table.xml')
+    table = mujoco.MjSpec.from_file(table_xml_path)
+    scene.attach(child=table,
+                 prefix=table.modelname + '/',
+                 frame=attachment_frame)
+    
+    # Robot torso
+    robot_torso_xml_path = os.path.join(os.getcwd(), 'robot_torso', 'robot_torso.xml')
+    robot_torso = mujoco.MjSpec.from_file(robot_torso_xml_path)
+    scene.attach(child=robot_torso,
+                 prefix=robot_torso.modelname + '/',
+                 frame=attachment_frame)
+    
+    # Left robot arm (xarm7)
+    robot_xml_path = os.path.join(os.getcwd(), 'ufactory_xarm7', 'xarm7.xml')
+    left_robot_arm = mujoco.MjSpec.from_file(robot_xml_path)
+    left_robot_arm.modelname = 'xarm7_left'
+    left_robot_arm_attachment_frame = scene.worldbody.add_frame(pos=[-0.05692, 0, 0.44761],
+                                                                quat=transformations.euler_to_quat([mujoco.mjPI/2, 0, -mujoco.mjPI*5/9], ordering='ZYX'))
+    
+    # Left robot hand (allegro)
+    left_robot_hand_xml_path = os.path.join(os.getcwd(), 'wonik_allegro', 'left_hand.xml')
+    left_robot_hand = mujoco.MjSpec.from_file(left_robot_hand_xml_path)
+    left_mount = left_robot_arm.body('link7').add_body(name='mount',
+                                                       pos=[0, 0, 0.01])
+    left_mount.add_geom(type=mujoco.mjtGeom.mjGEOM_CYLINDER,
+                        size=[0.03773072, 0.005, 0], # TODO: 3번째 값은 필요 없는 값 (mujoco 오류?)
+                        rgba=[0.2, 0.2, 0.2, 1],
+                        pos=[0, 0, -0.005])
+    left_robot_hand_attachment_frame = left_mount.add_frame(pos=[0, 0, 0.095],
+                                                            quat=transformations.euler_to_quat([0, -mujoco.mjPI/2, 0]))
+    left_robot_arm.attach(child=left_robot_hand,
+                          prefix=left_robot_hand.modelname + '/',
+                          frame=left_robot_hand_attachment_frame)
+    scene.attach(child=left_robot_arm,
+                 prefix=left_robot_arm.modelname + '/',
+                 frame=left_robot_arm_attachment_frame)
+    
+    # Right robot arm (xarm7)
+    right_robot_arm = mujoco.MjSpec.from_file(robot_xml_path)
+    right_robot_arm.modelname = 'xarm7_right'
+    right_robot_arm_attachment_frame = scene.worldbody.add_frame(pos=[0.05692, 0, 0.44761],
+                                                                 quat=transformations.euler_to_quat([mujoco.mjPI/2, 0, mujoco.mjPI*5/9], ordering='ZYX'))
+    
+    # Right robot hand (allegro)
+    right_robot_hand_xml_path = os.path.join(os.getcwd(), 'wonik_allegro', 'right_hand.xml')
+    right_robot_hand = mujoco.MjSpec.from_file(right_robot_hand_xml_path)
+    right_mount = right_robot_arm.body('link7').add_body(name='mount',
+                                                         pos=[0, 0, 0.01])
+    right_mount.add_geom(type=mujoco.mjtGeom.mjGEOM_CYLINDER,
+                         size=[0.03773072, 0.005, 0], # TODO: 3번째 값은 필요 없는 값 (mujoco 오류?)
+                         rgba=[0.2, 0.2, 0.2, 1],
+                         pos=[0, 0, -0.005])
+    right_robot_hand_attachment_frame = right_mount.add_frame(pos=[0, 0, 0.095],
+                                                              quat=transformations.euler_to_quat([0, -mujoco.mjPI/2, 0]))
+    right_robot_arm.attach(child=right_robot_hand,
+                           prefix=right_robot_hand.modelname + '/',
+                           frame=right_robot_hand_attachment_frame)
+    scene.attach(child=right_robot_arm,
+                 prefix=right_robot_arm.modelname + '/',
+                 frame=right_robot_arm_attachment_frame)
+    
+    # Barcode scanner
+    barcode_scanner_xml_path = os.path.join(os.getcwd(), 'barcode_scanner', 'barcode_scanner.xml')
+    barcode_scanner = mujoco.MjSpec.from_file(barcode_scanner_xml_path)
+    # barcode_scanner.default.mesh.inertia = 'exact'
+    barcode_scanner.default.geom.condim = 6
+    barcode_scanner.default.geom.priority = 1
+    barcode_scanner.body('barcode_scanner').add_freejoint()
+    barcode_scanner_attachment_frame = scene.worldbody.add_frame(pos=[-0.5, 0.45, 0.2],
+                                                                 quat=transformations.euler_to_quat([mujoco.mjPI, 0, mujoco.mjPI]))
+    scene.attach(child=barcode_scanner,
+                 prefix=barcode_scanner.modelname + '/',
+                 frame=barcode_scanner_attachment_frame)
+    
+    # Object grasping area
+    grasping_area_width = 0.34
+    grasping_area_length = 0.72
+    scene.worldbody.add_site(name='grasping_area',
+                             type=mujoco.mjtGeom.mjGEOM_BOX,
+                             group=4,
+                             pos=[0, 0.2 + grasping_area_width/2, 0],
+                             size=[grasping_area_length/2, grasping_area_width/2, 0.001],
+                             rgba=[0, 1, 0, 1])
+
+    # Box
+    box_width = 0.25
+    box_length = 0.34
+    box_height = 0.205 # 실제 높이는 0.21 (box_height + box_thickness)
+    box_thickness = 0.005
+    box_rgba = [0.7, 0.6, 0.4, 1]
+    box = scene.worldbody.add_body(name='box',
+                             pos=[0.36 + 0.125, 0.2 + 0.17, 0])
+    box.add_geom(name='base',
+                 type=mujoco.mjtGeom.mjGEOM_BOX,
+                 rgba=box_rgba,
+                 size=[box_width/2, box_length/2, box_thickness/2],
+                 pos=[0, 0, box_thickness/2])
+    box.add_geom(name='side_1',
+                 type=mujoco.mjtGeom.mjGEOM_BOX,
+                 rgba=box_rgba,
+                 size=[box_thickness/2, box_length/2, box_height/2],
+                 pos=[box_width/2 - box_thickness/2, 0, box_height/2 + box_thickness])
+    box.add_geom(name='side_2',
+                 type=mujoco.mjtGeom.mjGEOM_BOX,
+                 rgba=box_rgba,
+                 size=[box_width/2 - box_thickness, box_thickness/2, box_height/2],
+                 pos=[0, -box_length/2 + box_thickness/2, box_height/2 + box_thickness])
+    box.add_geom(name='side_3',
+                 type=mujoco.mjtGeom.mjGEOM_BOX,
+                 rgba=box_rgba,
+                 size=[box_thickness/2, box_length/2, box_height/2],
+                 pos=[-box_width/2 + box_thickness/2, 0, box_height/2 + box_thickness])
+    box.add_geom(name='side_4',
+                 type=mujoco.mjtGeom.mjGEOM_BOX,
+                 rgba=box_rgba,
+                 size=[box_width/2 - box_thickness, box_thickness/2, box_height/2],
+                 pos=[0, box_length/2 - box_thickness/2, box_height/2 + box_thickness])
+    
+    # Object
+    ycb_object_init_pose = [ # [x, y, z, roll, pitch, yaw] relative to world frame
+        [0.1, 0.25, 0.12, 0, 0, mujoco.mjPI/2], # 003_cracker_box
+        [-0.1, 0.25, 0.12, 0, 0, mujoco.mjPI/2], # 004_sugar_box
+        [0.1, 0.35, 0.12, 0, 0, mujoco.mjPI/2], # 005_tomato_soup_can
+        [-0.1, 0.35, 0.12, 0, 0, mujoco.mjPI/2], # 006_mustard_bottle
+        [0.1, 0.45, 0.12, mujoco.mjPI/2, mujoco.mjPI/2, 0], # 010_potted_meat_can
+        [-0.1, 0.45, 0.12, 0, 0, -mujoco.mjPI/2] # 021_bleach_cleanser
+    ]
+    ycb_object_barcode_pose = [ # [x, y, z, roll, pitch, yaw] relative to body frame
+        [-0.010259, 0.050995, -0.10498, mujoco.mjPI, 0, -mujoco.mjPI/2], # 003_cracker_box
+        [0.004512, 0.025381, -0.085659, mujoco.mjPI, 0, -mujoco.mjPI/2], # 004_sugar_box
+        [-0.025168, -0.023411, -0.028418, mujoco.mjPI/2, -mujoco.mjPI/4, 0], # 005_tomato_soup_can
+        [-0.026312, -0.000525, -0.043586, 0, -mujoco.mjPI/2, -mujoco.mjPI/2], # 006_mustard_bottle
+        [-0.00522, 0.005731, 0.047954, 0, 0, mujoco.mjPI/2], # 010_potted_meat_can
+        [0.031735, 0.01317, -0.073959, 0, mujoco.mjPI/2, mujoco.mjPI*88/180] # 021_bleach_cleanser
+    ]
+    ycb_object_file_dir = os.path.join(os.getcwd(), 'ycb')
+    ycb_object_name_list = os.listdir(ycb_object_file_dir)
+    for id, ycb_object_name in enumerate(ycb_object_name_list):
+        file_names = os.listdir(os.path.join(ycb_object_file_dir, ycb_object_name))
+        xml_file_name = [file_name for file_name in file_names if file_name.lower().endswith('.xml')][0]
+        ycb_object_xml_path = os.path.join(ycb_object_file_dir, ycb_object_name, xml_file_name)
+        ycb_object = mujoco.MjSpec.from_file(ycb_object_xml_path)
+        ycb_object.body(ycb_object.modelname).add_freejoint()
+        # ycb_object.default.mesh.inertia = 'exact'
+        ycb_object.default.geom.condim = 6
+        ycb_object.default.geom.priority = 1
+        # Add barcode site
+        ycb_object.body(ycb_object.modelname).add_site(name='barcode',
+                                                       group=4,
+                                                       size=[0.005, 0, 0], # TODO: 2~3번째 값은 필요 없는 값 (mujoco 오류?)
+                                                       rgba=[1, 0, 0, 1],
+                                                       pos=ycb_object_barcode_pose[id][:3],
+                                                       quat=transformations.euler_to_quat(ycb_object_barcode_pose[id][3:]))
+        ycb_object_attachment_frame = scene.worldbody.add_frame(pos=ycb_object_init_pose[id][:3],
+                                                                quat=transformations.euler_to_quat(ycb_object_init_pose[id][3:]))
+        scene.attach(child=ycb_object,
+                     prefix=ycb_object.modelname + '/',
+                     frame=ycb_object_attachment_frame)
+    
+    # Option
+    # scene.option.timestep= 0.001
+    # scene.option.o_solref = [0.002, 1]
+    # scene.option.integrator = mujoco.mjtIntegrator.mjINT_IMPLICIT
+    # scene.option.cone = mujoco.mjtCone.mjCONE_ELLIPTIC
+    # scene.option.enableflags |= mujoco.mjtEnableBit.mjENBL_OVERRIDE
+    # scene.option.enableflags |= mujoco.mjtEnableBit.mjENBL_MULTICCD
+    # scene.compiler.inertiagrouprange = [0, 2]
+    
+    # Initial state
+    initial_qpos = (
+        [-mujoco.mjPI, 0, -mujoco.mjPI, mujoco.mjPI/6, 0, 0, 0,] # left arm
+        + [0, 1.6, 1.3, 0.5, 0, 1.6, 1.3, 0.5, 0, 1.6, 1.3, 0.5, 0, 1.1, 1.1, 0.5] # left hand
+        + [0, 0, 0, mujoco.mjPI/6, -mujoco.mjPI, 0, mujoco.mjPI] # right arm
+        + [0]*16 # right hand
+        + [-0.18, 0.45, 0.49, 0.410932, 0.312626, 0.60471, 0.606404] # barcode scanner
+        + ycb_object_init_pose[0][:3] + transformations.euler_to_quat(ycb_object_init_pose[0][3:]).tolist() # 003_cracker_box
+        + ycb_object_init_pose[1][:3] + transformations.euler_to_quat(ycb_object_init_pose[1][3:]).tolist() # 004_sugar_box
+        + ycb_object_init_pose[2][:3] + transformations.euler_to_quat(ycb_object_init_pose[2][3:]).tolist() # 005_tomato_soup_can
+        + ycb_object_init_pose[3][:3] + transformations.euler_to_quat(ycb_object_init_pose[3][3:]).tolist() # 006_mustard_bottle
+        + ycb_object_init_pose[4][:3] + transformations.euler_to_quat(ycb_object_init_pose[4][3:]).tolist() # 010_potted_meat_can
+        + ycb_object_init_pose[5][:3] + transformations.euler_to_quat(ycb_object_init_pose[5][3:]).tolist() # 021_bleach_cleanser
+    )
+    initial_ctrl = initial_qpos[:46]
+    key = scene.add_key(qpos=initial_qpos, ctrl=initial_ctrl)
+
+    print(f'Completed making the MJCF model.')
+
+    model = scene.compile()
+    data = mujoco.MjData(model)
+    # scene.to_file(os.path.join(os.getcwd(), 'mjcf_model.xml'))
+    viewer.launch(model, data)
