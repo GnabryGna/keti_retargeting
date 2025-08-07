@@ -57,6 +57,7 @@
   </asset>
   <worldbody>
     <body name="005_tomato_soup_can">
+      <freejoint/>
       <geom material="material_0" mesh="005_tomato_soup_can" class="visual" mass="0.349"/>
       <geom mesh="005_tomato_soup_can_collision_0" rgba="0.9226323789897403 0.9884231499538048 0.2133746818497495 1" class="collision"/>
       <geom mesh="005_tomato_soup_can_collision_1" rgba="0.2837774521147435 0.15735774998357988 0.8928365768205856 1" class="collision"/>
@@ -100,6 +101,7 @@
       <geom mesh="005_tomato_soup_can_collision_39" rgba="0.6255048228641252 0.6124669112140175 0.43454031093453815 1" class="collision"/>
       <geom mesh="005_tomato_soup_can_collision_40" rgba="0.8166388347033485 0.21399001280655583 0.901150916260084 1" class="collision"/>
       <geom mesh="005_tomato_soup_can_collision_41" rgba="0.44465010147353645 0.24104523852257032 0.5590969636141309 1" class="collision"/>
+      <site name="barcode" pos="-0.025168 -0.023411 -0.028418" quat="0.653281 0.653281 -0.270598 -0.270598" group="4" rgba="1 0 0 1"/>
     </body>
   </worldbody>
 </mujoco>

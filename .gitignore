@@ -1,5 +1,0 @@
-# Exclude editor config
-.vscode/
-
-# Exclude temporary folders
-output/

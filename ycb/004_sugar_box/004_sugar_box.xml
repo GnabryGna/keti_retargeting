@@ -17,9 +17,11 @@
   </asset>
   <worldbody>
     <body name="004_sugar_box">
+      <freejoint/>
       <geom material="material_0" mesh="004_sugar_box" class="visual" mass="0.514"/>
       <geom mesh="004_sugar_box_collision_0" rgba="0.9996925216047713 0.6190383006943406 0.5864117060911184 1" class="collision"/>
       <geom mesh="004_sugar_box_collision_1" rgba="0.4100306289037843 0.31564247054629746 0.06322521677897464 1" class="collision"/>
+      <site name="barcode" pos="0.004512 0.025381 -0.085659" quat="0 0.707107 0.707107 0" group="4" rgba="1 0 0 1"/>
     </body>
   </worldbody>
 </mujoco>

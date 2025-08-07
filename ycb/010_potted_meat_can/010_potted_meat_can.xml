@@ -46,6 +46,7 @@
   </asset>
   <worldbody>
     <body name="010_potted_meat_can">
+      <freejoint/>
       <geom material="material_0" mesh="010_potted_meat_can" class="visual" mass="0.37"/>
       <geom mesh="010_potted_meat_can_collision_0" rgba="0.1409777876840017 0.5487277647546145 0.7400178948038156 1" class="collision"/>
       <geom mesh="010_potted_meat_can_collision_1" rgba="0.9963747889999649 0.15329496776603968 0.3777625378869308 1" class="collision"/>
@@ -78,6 +79,7 @@
       <geom mesh="010_potted_meat_can_collision_28" rgba="0.40341366950255464 0.12954772879455934 0.004748134101589141 1" class="collision"/>
       <geom mesh="010_potted_meat_can_collision_29" rgba="0.2651389476639312 0.7432861624371373 0.6394723829384696 1" class="collision"/>
       <geom mesh="010_potted_meat_can_collision_30" rgba="0.9342731565233395 0.8816139524915747 0.9849008040701915 1" class="collision"/>
+      <site name="barcode" pos="-0.00522 0.005731 0.047954" quat="0.707107 0 0 0.707107" group="4" rgba="1 0 0 1"/>
     </body>
   </worldbody>
 </mujoco>
