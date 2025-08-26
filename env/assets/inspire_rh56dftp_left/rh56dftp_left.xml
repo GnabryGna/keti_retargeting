@@ -1,0 +1,208 @@
+<mujoco model="inspire_rh56dftp_left">
+  <compiler angle="radian" meshdir="assets" autolimits="true"/>
+
+  <asset>
+    <material name="black" rgba="0.2 0.2 0.2 1"/>
+    <material name="white" rgba="0.9 0.9 0.9 1"/>
+
+    <mesh file="base_link.obj"/>
+    <mesh file="thumb_proximal_1.obj"/>
+    <mesh file="thumb_proximal_2.obj"/>
+    <mesh file="thumb_middle.obj"/>
+    <mesh file="thumb_distal.obj"/>
+    <mesh file="index_proximal.obj"/>
+    <mesh file="index_distal.obj"/>
+    <mesh file="middle_proximal.obj"/>
+    <mesh file="middle_distal.obj"/>
+    <mesh file="ring_proximal.obj"/>
+    <mesh file="ring_distal.obj"/>
+    <mesh file="little_proximal.obj"/>
+    <mesh file="little_distal.obj"/>
+    <mesh file="palm_force_sensor.obj"/>
+    <mesh file="thumb_proximal_force_sensor.obj"/>
+    <mesh file="thumb_middle_force_sensor.obj"/>
+    <mesh file="thumb_distal_force_sensor.obj"/>
+    <mesh file="thumb_fingertip_force_sensor.obj"/>
+    <mesh file="index_proximal_force_sensor.obj"/>
+    <mesh file="index_distal_force_sensor.obj"/>
+    <mesh file="index_fingertip_force_sensor.obj"/>
+    <mesh file="middle_proximal_force_sensor.obj"/>
+    <mesh file="middle_distal_force_sensor.obj"/>
+    <mesh file="middle_fingertip_force_sensor.obj"/>
+    <mesh file="ring_proximal_force_sensor.obj"/>
+    <mesh file="ring_distal_force_sensor.obj"/>
+    <mesh file="ring_fingertip_force_sensor.obj"/>
+    <mesh file="little_proximal_force_sensor.obj"/>
+    <mesh file="little_distal_force_sensor.obj"/>
+    <mesh file="little_fingertip_force_sensor.obj"/>
+  </asset>
+
+  <default>
+    <default class="visual">
+      <geom type="mesh" contype="0" conaffinity="0" group="2" material="white"/>
+      <default class="visual_force_sensor">
+        <geom material="black"/>
+      </default>
+    </default>
+
+    <default class="collision">
+      <geom type="mesh" group="3" material="white" mass="0"/>
+      <default class="collision_force_sensor">
+        <geom material="black"/>
+      </default>
+    </default>
+
+    <default class="base">
+      <joint axis="0 0 1" damping="0.1"/>
+      <default class="thumb_proximal_1">
+        <joint range="0 1.1641"/>
+        <position ctrlrange="0 1.1641"/>
+      </default>
+      <default class="thumb_proximal_2">
+        <joint axis="0 0 -1" range="0 0.5864"/>
+        <position ctrlrange="0 0.5864"/>
+      </default>
+      <default class="thumb_middle">
+        <joint axis="0 0 -1" range="0 0.5"/>
+        <position ctrlrange="0 0.5"/>
+      </default>
+      <default class="thumb_distal">
+        <joint axis="0 0 -1" range="0 0.5"/>
+        <position ctrlrange="0 0.5"/>
+      </default>
+      <default class="proximal">
+        <joint range="0 1.4381"/>
+        <position ctrlrange="0 1.4381"/>
+      </default>
+      <default class="distal">
+        <joint range="0 1.4381"/>
+        <position ctrlrange="0 1.4381"/>
+      </default>
+    </default>
+  </default>
+
+  <worldbody>
+    <body name="base_link">
+      <geom mesh="base_link" class="visual"/>
+      <geom mesh="base_link" class="collision"/>
+      <geom pos="0.00036819 0.012296 0.1196" quat="-2.59734e-06 -2.59735e-06 0.707108 0.707105" mesh="palm_force_sensor" class="visual_force_sensor"/>
+      <geom pos="0.00036819 0.012296 0.1196" quat="-2.59734e-06 -2.59735e-06 0.707108 0.707105" mesh="palm_force_sensor" class="collision_force_sensor"/>
+      <body name="thumb_proximal_1" pos="0.0269 0.02101 0.0689">
+        <joint name="thumb_proximal_1_joint" class="thumb_proximal_1"/>
+        <geom mesh="thumb_proximal_1" class="visual"/>
+        <geom mesh="thumb_proximal_1" class="collision"/>
+        <body name="thumb_proximal_2" pos="0.0073431 0.011232 0.0052" quat="0.0922934 0.0922938 -0.701059 -0.701056">
+          <joint name="thumb_proximal_2_joint" class="thumb_proximal_2"/>
+          <geom mesh="thumb_proximal_2" class="visual"/>
+          <geom mesh="thumb_proximal_2" class="collision"/>
+          <geom pos="-0.0087121 0.026305 -0.0089605" quat="0.405917 -0.578993 -0.405916 -0.578991" mesh="thumb_proximal_force_sensor" class="visual_force_sensor"/>
+          <geom pos="-0.0087121 0.026305 -0.0089605" quat="0.405917 -0.578993 -0.405916 -0.578991" mesh="thumb_proximal_force_sensor" class="collision_force_sensor"/>
+          <body name="thumb_middle" pos="-0.031403 0.021069 -0.001299">
+            <joint name="thumb_middle_joint" class="thumb_middle"/>
+            <geom mesh="thumb_middle" class="visual"/>
+            <geom mesh="thumb_middle" class="collision"/>
+            <geom pos="-0.011771 0.01699 -0.0077514" quat="0.428302 -0.562766 -0.428175 -0.562599" mesh="thumb_middle_force_sensor" class="visual_force_sensor"/>
+            <geom pos="-0.011771 0.01699 -0.0077514" quat="0.428302 -0.562766 -0.428175 -0.562599" mesh="thumb_middle_force_sensor" class="collision_force_sensor"/>
+            <body name="thumb_distal" pos="-0.021903 0.012816 -0.0003">
+              <joint name="thumb_distal_joint" class="thumb_distal"/>
+              <geom mesh="thumb_distal" class="visual"/>
+              <geom mesh="thumb_distal" class="collision"/>
+              <geom pos="-0.014598 0.014721 -0.0073103" quat="0.348432 -0.615302 -0.348433 -0.615299" mesh="thumb_distal_force_sensor" class="visual_force_sensor"/>
+              <geom pos="-0.014598 0.014721 -0.0073103" quat="0.348432 -0.615302 -0.348433 -0.615299" mesh="thumb_distal_force_sensor" class="collision_force_sensor"/>
+              <geom pos="-0.028987 0.017301 -0.0073513" quat="-0.356218 0.610827 -0.356216 -0.610827" mesh="thumb_fingertip_force_sensor" class="visual_force_sensor"/>
+              <geom pos="-0.028987 0.017301 -0.0073513" quat="-0.356218 0.610827 -0.356216 -0.610827" mesh="thumb_fingertip_force_sensor" class="collision_force_sensor"/>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="index_proximal" pos="0.038679 0.00056467 0.1564" quat="0.508647 0.491199 -0.491201 -0.508648">
+        <joint name="index_proximal_joint" class="proximal"/>
+        <geom mesh="index_proximal" class="visual"/>
+        <geom mesh="index_proximal" class="collision"/>
+        <geom pos="-0.012046 0.019649 0.006651" quat="0.701686 -0.0622873 -0.704358 -0.0873853" mesh="index_proximal_force_sensor" class="visual_force_sensor"/>
+        <geom pos="-0.012046 0.019649 0.006651" quat="0.701686 -0.0622873 -0.704358 -0.0873853" mesh="index_proximal_force_sensor" class="collision_force_sensor"/>
+        <body name="index_distal" pos="-0.0034259 0.032596 0.00055">
+          <joint name="index_distal_joint" class="distal"/>
+          <geom mesh="index_distal" class="visual"/>
+          <geom mesh="index_distal" class="collision"/>
+          <geom pos="-0.0081655 0.037446 0.0060795" quat="0.698536 0.13559 -0.693985 0.109758" mesh="index_distal_force_sensor" class="visual_force_sensor"/>
+          <geom pos="-0.0081655 0.037446 0.0060795" quat="0.698536 0.13559 -0.693985 0.109758" mesh="index_distal_force_sensor" class="collision_force_sensor"/>
+          <geom pos="-0.0086237 0.052572 0.0060954" quat="0.658743 -0.226725 -0.669773 -0.257017" mesh="index_fingertip_force_sensor" class="visual_force_sensor"/>
+          <geom pos="-0.0086237 0.052572 0.0060954" quat="0.658743 -0.226725 -0.669773 -0.257017" mesh="index_fingertip_force_sensor" class="collision_force_sensor"/>
+        </body>
+      </body>
+      <body name="middle_proximal" pos="0.0171 0.00056467 0.157" quat="0.499998 0.5 -0.500002 -0.5">
+        <joint name="middle_proximal_joint" class="proximal"/>
+        <geom mesh="middle_proximal" class="visual"/>
+        <geom mesh="middle_proximal" class="collision"/>
+        <geom pos="-0.012046 0.019649 0.006651" quat="0.703134 -0.0748456 -0.703135 -0.0748437" mesh="middle_proximal_force_sensor" class="visual_force_sensor"/>
+        <geom pos="-0.012046 0.019649 0.006651" quat="0.703134 -0.0748456 -0.703135 -0.0748437" mesh="middle_proximal_force_sensor" class="collision_force_sensor"/>
+        <body name="middle_distal" pos="-0.0034259 0.032596 0.00055">
+          <joint name="middle_distal_joint" class="distal"/>
+          <geom mesh="middle_distal" class="visual"/>
+          <geom mesh="middle_distal" class="collision"/>
+          <geom pos="-0.009086 0.040962 0.0061003" quat="0.694858 0.131041 -0.694858 0.131044" mesh="middle_distal_force_sensor" class="visual_force_sensor"/>
+          <geom pos="-0.009086 0.040962 0.0061003" quat="0.694858 0.131041 -0.694858 0.131044" mesh="middle_distal_force_sensor" class="collision_force_sensor"/>
+          <geom pos="-0.0098294 0.056051 0.0061006" quat="0.667288 -0.233938 -0.667289 -0.233936" mesh="middle_fingertip_force_sensor" class="visual_force_sensor"/>
+          <geom pos="-0.0098294 0.056051 0.0061006" quat="0.667288 -0.233938 -0.667289 -0.233936" mesh="middle_fingertip_force_sensor" class="collision_force_sensor"/>
+        </body>
+      </body>
+      <body name="ring_proximal" pos="-0.0045302 0.00056467 0.15683" quat="0.486728 0.512927 -0.512929 -0.48673">
+        <joint name="ring_proximal_joint" class="proximal"/>
+        <geom mesh="ring_proximal" class="visual"/>
+        <geom mesh="ring_proximal" class="collision"/>
+        <geom pos="-0.012046 0.019649 0.006651" quat="0.704887 -0.0936618 -0.700876 -0.0559809" mesh="ring_proximal_force_sensor" class="visual_force_sensor"/>
+        <geom pos="-0.012046 0.019649 0.006651" quat="0.704887 -0.0936618 -0.700876 -0.0559809" mesh="ring_proximal_force_sensor" class="collision_force_sensor"/>
+        <body name="ring_distal" pos="-0.0034259 0.032596 0.00055">
+          <joint name="ring_distal_joint" class="distal"/>
+          <geom mesh="ring_distal" class="visual"/>
+          <geom mesh="ring_distal" class="collision"/>
+          <geom pos="-0.0081655 0.037446 0.0060795" quat="0.692694 0.103257 -0.699527 0.142038" mesh="ring_distal_force_sensor" class="visual_force_sensor"/>
+          <geom pos="-0.0081655 0.037446 0.0060795" quat="0.692694 0.103257 -0.699527 0.142038" mesh="ring_distal_force_sensor" class="collision_force_sensor"/>
+          <geom pos="-0.0086237 0.052572 0.0060954" quat="0.6723 -0.264487 -0.655779 -0.219118" mesh="ring_fingertip_force_sensor" class="visual_force_sensor"/>
+          <geom pos="-0.0086237 0.052572 0.0060954" quat="0.6723 -0.264487 -0.655779 -0.219118" mesh="ring_fingertip_force_sensor" class="collision_force_sensor"/>
+        </body>
+      </body>
+      <body name="little_proximal" pos="-0.025916 0.00056467 0.15365" quat="0.47315 0.525478 -0.52548 -0.473152">
+        <joint name="little_proximal_joint" class="proximal"/>
+        <geom mesh="little_proximal" class="visual"/>
+        <geom mesh="little_proximal" class="collision"/>
+        <geom pos="-0.012046 0.019649 0.006651" quat="0.706132 -0.112374 -0.69812 -0.0371073" mesh="little_proximal_force_sensor" class="visual_force_sensor"/>
+        <geom pos="-0.012046 0.019649 0.006651" quat="0.706132 -0.112374 -0.69812 -0.0371073" mesh="little_proximal_force_sensor" class="collision_force_sensor"/>
+        <body name="little_distal" pos="-0.0034259 0.032596 0.00055">
+          <joint name="little_distal_joint" class="distal"/>
+          <geom mesh="little_distal" class="visual"/>
+          <geom mesh="little_distal" class="collision"/>
+          <geom pos="-0.0064514 0.027683 0.0061172" quat="0.689046 0.0814204 -0.702404 0.158792" mesh="little_distal_force_sensor" class="visual_force_sensor"/>
+          <geom pos="-0.0064514 0.027683 0.0061172" quat="0.689046 0.0814204 -0.702404 0.158792" mesh="little_distal_force_sensor" class="collision_force_sensor"/>
+          <geom pos="-0.0063973 0.042707 0.0061154" quat="0.678772 -0.289133 -0.645293 -0.198161" mesh="little_fingertip_force_sensor" class="visual_force_sensor"/>
+          <geom pos="-0.0063973 0.042707 0.0061154" quat="0.678772 -0.289133 -0.645293 -0.198161" mesh="little_fingertip_force_sensor" class="collision_force_sensor"/>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <contact>
+    <exclude body1="base_link" body2="thumb_proximal_1"/>
+    <exclude body1="base_link" body2="thumb_proximal_2"/>
+    <exclude body1="base_link" body2="index_proximal"/>
+    <exclude body1="base_link" body2="middle_proximal"/>
+    <exclude body1="base_link" body2="ring_proximal"/>
+    <exclude body1="base_link" body2="little_proximal"/>
+  </contact>
+
+  <actuator>
+    <position name="thumb_proximal_1" joint="thumb_proximal_1_joint" class="thumb_proximal_1"/>
+    <position name="thumb_proximal_2" joint="thumb_proximal_2_joint" class="thumb_proximal_2"/>
+    <position name="thumb_middle" joint="thumb_middle_joint" class="thumb_middle"/>
+    <position name="thumb_distal" joint="thumb_distal_joint" class="thumb_distal"/>
+    <position name="index_proximal" joint="index_proximal_joint" class="proximal"/>
+    <position name="index_distal" joint="index_distal_joint" class="distal"/>
+    <position name="middle_proximal" joint="middle_proximal_joint" class="proximal"/>
+    <position name="middle_distal" joint="middle_distal_joint" class="distal"/>
+    <position name="ring_proximal" joint="ring_proximal_joint" class="proximal"/>
+    <position name="ring_distal" joint="ring_distal_joint" class="distal"/>
+    <position name="little_proximal" joint="little_proximal_joint" class="proximal"/>
+    <position name="little_distal" joint="little_distal_joint" class="distal"/>
+  </actuator>
+</mujoco>
