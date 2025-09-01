@@ -1,0 +1,13 @@
+<mujoco model="table">
+  <compiler meshdir="assets"/>
+
+  <asset>
+    <mesh file="table.stl"/>
+  </asset>
+
+  <worldbody>
+    <body name="table">
+      <geom type="mesh" mesh="table" rgba="1 1 1 1"/>
+    </body>
+  </worldbody>
+</mujoco>
