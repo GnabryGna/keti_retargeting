@@ -206,11 +206,11 @@ def load():
 
     # Initial state (Inspire RH56DFTP)
     initial_qpos = (
-        [0, 0, 0, np.pi/6, np.pi, 0, -np.pi/2] # left arm
-        + [1.16, 0, 0.5, 0.5, 1.44, 1.1, 1.44, 1.1, 1.44, 1.1, 1.44, 1.1] # left hand
+        [0, 0, 0, np.pi/6, 0, 0, np.pi/2] # left arm
+        + [1.1624, 0, 0, 0, 1.25, 1.35, 1.25, 1.35, 1.25, 1.35, 1.25, 1.35] # left hand
         + [0, 0, 0, np.pi/6, 0, 0, 0] # right arm
         + [0]*12 # right hand
-        + [-0.0825745, 0.360802, 0.508715, -0.2468, -0.143711, -0.592187, -0.753493] # barcode scanner
+        + [-0.14742, 0.484668, 0.496348, 0.411075, 0.231993, 0.544672, 0.693202] # barcode scanner
         + [0.517, 0.253, 0.112, 0.707107, 0, 0, 0.707107] # 003_cracker_box
         + [0.442, 0.340, 0.092, 0.707107, 0, 0, 0.707107] # 004_sugar_box
         + [0.549, 0.334, 0.058, 0.707107, 0, 0, 0.707107] # 005_tomato_soup_can
@@ -218,7 +218,12 @@ def load():
         + [0.542, 0.403, 0.048, 0.707107, 0, 0, 0.707107] # 010_potted_meat_can
         + [0.423, 0.465, 0.110, 0.707107, 0, 0, 0.707107] # 021_bleach_cleanser
     )
-    initial_ctrl = initial_qpos[:38]
+    initial_ctrl = (
+        [0, 0, 0, np.pi/6, 0, 0, np.pi/2] # left arm
+        + [1.1624, 0, 1.4244, 1.4244, 1.4244, 1.4244] # left hand
+        + [0, 0, 0, np.pi/6, 0, 0, 0] # right arm
+        + [0, 0, 0, 0, 0, 0] # right hand
+    )
     scene.add_key(name='initial_state', qpos=initial_qpos, ctrl=initial_ctrl)
 
     model = scene.compile()

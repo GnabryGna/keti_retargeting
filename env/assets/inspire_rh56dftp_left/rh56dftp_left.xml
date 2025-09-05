@@ -314,30 +314,27 @@
     </default>
 
     <default class="base">
-      <joint axis="0 0 1" damping="0.1"/>
-      <default class="thumb_proximal_1">
-        <joint range="0 1.1641"/>
-        <position ctrlrange="0 1.1641"/>
+      <joint armature="0.001" damping="0.05" frictionloss="0.001"/>
+      <default class="thumb_proximal_rotation">
+        <joint range="0 1.1624"/>
+        <position ctrlrange="0 1.624"/>
       </default>
-      <default class="thumb_proximal_2">
-        <joint axis="0 0 -1" range="0 0.5864"/>
-        <position ctrlrange="0 0.5864"/>
+      <default class="thumb_proximal_bending">
+        <joint axis="0 0 -1" range="0 0.586"/>
+        <position ctrlrange="0 0.586"/>
       </default>
       <default class="thumb_middle">
-        <joint axis="0 0 -1" range="0 0.5"/>
-        <position ctrlrange="0 0.5"/>
+        <joint axis="0 0 -1" range="0 0.7292"/>
       </default>
       <default class="thumb_distal">
-        <joint axis="0 0 -1" range="0 0.5"/>
-        <position ctrlrange="0 0.5"/>
+        <joint axis="0 0 -1" range="0 0.5560"/>
       </default>
       <default class="proximal">
-        <joint range="0 1.4381"/>
-        <position ctrlrange="0 1.4381"/>
+        <joint range="0 1.4244"/>
+        <position ctrlrange="0 1.4244"/>
       </default>
       <default class="distal">
-        <joint range="0 1.4381"/>
-        <position ctrlrange="0 1.4381"/>
+        <joint range="0 1.5445"/>
       </default>
     </default>
   </default>
@@ -496,11 +493,11 @@
       <geom pos="0.00036819 0.012296 0.1196" quat="-2.59734e-06 -2.59735e-06 0.707108 0.707105" mesh="palm_force_sensor" class="visual_force_sensor"/>
       <geom pos="0.00036819 0.012296 0.1196" quat="-2.59734e-06 -2.59735e-06 0.707108 0.707105" mesh="palm_force_sensor" class="collision_force_sensor"/>
       <body name="thumb_proximal_1" pos="0.0269 0.02101 0.0689">
-        <joint name="thumb_proximal_1_joint" class="thumb_proximal_1"/>
+        <joint name="thumb_proximal_rotation_joint" class="thumb_proximal_rotation"/>
         <geom mesh="thumb_proximal_1" class="visual"/>
         <geom mesh="thumb_proximal_1" class="collision"/>
         <body name="thumb_proximal_2" pos="0.0073431 0.011232 0.0052" quat="0.0922934 0.0922938 -0.701059 -0.701056">
-          <joint name="thumb_proximal_2_joint" class="thumb_proximal_2"/>
+          <joint name="thumb_proximal_bending_joint" class="thumb_proximal_bending"/>
           <geom mesh="thumb_proximal_2" class="visual"/>
           <geom mesh="thumb_proximal_2" class="collision"/>
           <geom pos="-0.0087121 0.026305 -0.0089605" quat="0.405917 -0.578993 -0.405916 -0.578991" mesh="thumb_proximal_force_sensor" class="visual_force_sensor"/>
@@ -707,18 +704,21 @@
     <exclude body1="base_link" body2="little_proximal"/>
   </contact>
 
+  <equality>
+    <joint joint1="thumb_middle_joint" joint2="thumb_proximal_bending_joint" polycoef="0 1.2443 0 0 0"/>
+    <joint joint1="thumb_distal_joint" joint2="thumb_proximal_bending_joint" polycoef="0 0.9487 0 0 0"/>
+    <joint joint1="index_distal_joint" joint2="index_proximal_joint" polycoef="0 1.0843 0 0 0"/>
+    <joint joint1="middle_distal_joint" joint2="middle_proximal_joint" polycoef="0 1.0843 0 0 0"/>
+    <joint joint1="ring_distal_joint" joint2="ring_proximal_joint" polycoef="0 1.0843 0 0 0"/>
+    <joint joint1="little_distal_joint" joint2="little_proximal_joint" polycoef="0 1.0843 0 0 0"/>
+  </equality>
+
   <actuator>
-    <position name="thumb_proximal_1" joint="thumb_proximal_1_joint" class="thumb_proximal_1"/>
-    <position name="thumb_proximal_2" joint="thumb_proximal_2_joint" class="thumb_proximal_2"/>
-    <position name="thumb_middle" joint="thumb_middle_joint" class="thumb_middle"/>
-    <position name="thumb_distal" joint="thumb_distal_joint" class="thumb_distal"/>
+    <position name="thumb_proximal_rotation" joint="thumb_proximal_rotation_joint" class="thumb_proximal_rotation"/>
+    <position name="thumb_proximal_bending" joint="thumb_proximal_bending_joint" class="thumb_proximal_bending"/>
     <position name="index_proximal" joint="index_proximal_joint" class="proximal"/>
-    <position name="index_distal" joint="index_distal_joint" class="distal"/>
     <position name="middle_proximal" joint="middle_proximal_joint" class="proximal"/>
-    <position name="middle_distal" joint="middle_distal_joint" class="distal"/>
     <position name="ring_proximal" joint="ring_proximal_joint" class="proximal"/>
-    <position name="ring_distal" joint="ring_distal_joint" class="distal"/>
     <position name="little_proximal" joint="little_proximal_joint" class="proximal"/>
-    <position name="little_distal" joint="little_distal_joint" class="distal"/>
   </actuator>
 </mujoco>
