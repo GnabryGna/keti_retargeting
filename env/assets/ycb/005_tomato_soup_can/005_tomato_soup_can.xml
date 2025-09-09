@@ -1,5 +1,6 @@
 <mujoco model="005_tomato_soup_can">
   <compiler meshdir="assets" texturedir="assets"/>
+  
   <default>
     <default class="visual">
       <geom group="2" type="mesh" contype="0" conaffinity="0"/>
@@ -8,9 +9,10 @@
       <geom group="3" type="mesh" mass="0"/>
     </default>
   </default>
+  
   <asset>
     <texture type="2d" name="texture_map" file="texture_map.png"/>
-    <material name="material_0" texture="texture_map" specular="0.5" shininess="0.5"/>
+    <material name="material_0" texture="texture_map"/>
     <mesh file="005_tomato_soup_can.obj"/>
     <mesh file="005_tomato_soup_can_collision_0.obj"/>
     <mesh file="005_tomato_soup_can_collision_1.obj"/>
@@ -55,9 +57,10 @@
     <mesh file="005_tomato_soup_can_collision_40.obj"/>
     <mesh file="005_tomato_soup_can_collision_41.obj"/>
   </asset>
+  
   <worldbody>
     <body name="005_tomato_soup_can">
-      <freejoint name="005_tomato_soup_can"/>
+      <freejoint name="joint"/>
       <geom name="005_tomato_soup_can" material="material_0" mesh="005_tomato_soup_can" class="visual" mass="0.349"/>
       <geom mesh="005_tomato_soup_can_collision_0" rgba="0.9226323789897403 0.9884231499538048 0.2133746818497495 1" class="collision"/>
       <geom mesh="005_tomato_soup_can_collision_1" rgba="0.2837774521147435 0.15735774998357988 0.8928365768205856 1" class="collision"/>

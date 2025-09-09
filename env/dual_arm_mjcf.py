@@ -106,18 +106,6 @@ def load():
                  prefix=right_robot_arm.modelname + '/',
                  frame=right_robot_arm_attachment_frame)
     
-    # Barcode scanner
-    barcode_scanner_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'barcode_scanner', 'barcode_scanner.xml')
-    barcode_scanner = mujoco.MjSpec.from_file(barcode_scanner_xml_path)
-    # barcode_scanner.default.mesh.inertia = 'exact'
-    barcode_scanner.default.geom.condim = 6
-    barcode_scanner.default.geom.priority = 1
-    barcode_scanner_attachment_frame = scene.worldbody.add_frame(pos=[-0.5, 0.45, 0.2],
-                                                                 euler=[np.pi, 0, np.pi])
-    scene.attach(child=barcode_scanner,
-                 prefix=barcode_scanner.modelname + '/',
-                 frame=barcode_scanner_attachment_frame)
-    
     # Object grasping area
     grasping_area_width = 0.34
     grasping_area_length = 0.72
@@ -162,6 +150,18 @@ def load():
                  size=[box_width/2 - box_thickness, box_thickness/2, box_height/2],
                  pos=[0, box_length/2 - box_thickness/2, box_height/2 + box_thickness])
     
+    # Barcode scanner
+    barcode_scanner_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'barcode_scanner', 'barcode_scanner.xml')
+    barcode_scanner = mujoco.MjSpec.from_file(barcode_scanner_xml_path)
+    # barcode_scanner.default.mesh.inertia = 'exact'
+    barcode_scanner.default.geom.condim = 6
+    barcode_scanner.default.geom.priority = 1
+    barcode_scanner_attachment_frame = scene.worldbody.add_frame(pos=[-0.5, 0.45, 0.2],
+                                                                 euler=[np.pi, 0, np.pi])
+    scene.attach(child=barcode_scanner,
+                 prefix=barcode_scanner.modelname + '/',
+                 frame=barcode_scanner_attachment_frame)
+
     # YCB object
     ycb_object_init_pose = ( # [x, y, z, roll, pitch, yaw] relative to world frame
         [0.1, 0.25, 0.12, 0.707107, 0, 0, 0.707107], # 003_cracker_box

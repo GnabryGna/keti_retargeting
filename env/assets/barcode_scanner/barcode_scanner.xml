@@ -1,17 +1,18 @@
 <mujoco model="barcode_scanner">
   <compiler meshdir="assets" texturedir="assets"/>
+
   <default>
     <default class="visual">
       <geom group="2" type="mesh" contype="0" conaffinity="0"/>
     </default>
     <default class="collision">
-      <!-- <geom group="3" type="mesh" mass="0"/> -->
-      <geom group="3" type="mesh"/>
+      <geom group="3" type="mesh" mass="0"/>
     </default>
   </default>
+  
   <asset>
     <texture type="2d" name="barcode_scanner" file="barcode_scanner.png"/>
-    <material name="material_0" texture="barcode_scanner" specular="1.0" shininess="1.0"/>
+    <material name="material_0" texture="barcode_scanner"/>
     <mesh file="barcode_scanner.obj"/>
     <mesh file="barcode_scanner_collision_0.obj"/>
     <mesh file="barcode_scanner_collision_1.obj"/>
@@ -108,9 +109,10 @@
     <mesh file="barcode_scanner_collision_92.obj"/>
     <mesh file="barcode_scanner_collision_93.obj"/>
   </asset>
+  
   <worldbody>
     <body name="barcode_scanner">
-      <freejoint/>
+      <freejoint name="joint"/>
       <geom material="material_0" mesh="barcode_scanner" class="visual" mass="0.16"/>
       <geom mesh="barcode_scanner_collision_0" rgba="0.19980927981823005 0.4288580357367924 0.23564255013610258 1" class="collision"/>
       <geom mesh="barcode_scanner_collision_1" rgba="0.2834961197168874 0.4891366295367552 0.9809570078447242 1" class="collision"/>

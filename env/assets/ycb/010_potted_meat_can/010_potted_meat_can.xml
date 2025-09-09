@@ -1,5 +1,6 @@
 <mujoco model="010_potted_meat_can">
   <compiler meshdir="assets" texturedir="assets"/>
+  
   <default>
     <default class="visual">
       <geom group="2" type="mesh" contype="0" conaffinity="0"/>
@@ -8,9 +9,10 @@
       <geom group="3" type="mesh" mass="0"/>
     </default>
   </default>
+  
   <asset>
     <texture type="2d" name="texture_map" file="texture_map.png"/>
-    <material name="material_0" texture="texture_map" specular="0.5" shininess="0.5"/>
+    <material name="material_0" texture="texture_map"/>
     <mesh file="010_potted_meat_can.obj"/>
     <mesh file="010_potted_meat_can_collision_0.obj"/>
     <mesh file="010_potted_meat_can_collision_1.obj"/>
@@ -44,9 +46,10 @@
     <mesh file="010_potted_meat_can_collision_29.obj"/>
     <mesh file="010_potted_meat_can_collision_30.obj"/>
   </asset>
+  
   <worldbody>
     <body name="010_potted_meat_can">
-      <freejoint name="010_potted_meat_can"/>
+      <freejoint name="joint"/>
       <geom name="010_potted_meat_can" material="material_0" mesh="010_potted_meat_can" class="visual" mass="0.37"/>
       <geom mesh="010_potted_meat_can_collision_0" rgba="0.1409777876840017 0.5487277647546145 0.7400178948038156 1" class="collision"/>
       <geom mesh="010_potted_meat_can_collision_1" rgba="0.9963747889999649 0.15329496776603968 0.3777625378869308 1" class="collision"/>

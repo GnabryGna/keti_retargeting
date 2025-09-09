@@ -2,14 +2,14 @@ import mujoco
 import numpy as np
 
 from env import dual_arm_mjcf
-from env.robot import AllegroHandV4
-# from env.robot import InspireRH56DFTP
+# from env.robot import AllegroHandV4
+from env.robot import InspireRH56DFTP
 from env.robot import xArm7
 
 
 class DualArmEnv:
-    BARCODE_SCANNER_NAME = 'barcode_scanner/barcode_scanner'
-    YCB_OBJECT_NAME_LIST = [
+    BARCODE_SCANNER_BODY_NAME = 'barcode_scanner/barcode_scanner'
+    YCB_OBJECT_BODY_NAMES = [
         '003_cracker_box/003_cracker_box',
         '004_sugar_box/004_sugar_box',
         '005_tomato_soup_can/005_tomato_soup_can',
@@ -23,20 +23,27 @@ class DualArmEnv:
         self.model = mjcf.compile()
         self.data = mujoco.MjData(self.model)
 
-        self.left_robot_arm = xArm7(self.model, self.data)
-        self.right_robot_arm = xArm7(self.model, self.data)
-        self.left_robot_hand = AllegroHandV4(self.model, self.data)
-        self.right_robot_hand = AllegroHandV4(self.model, self.data)
+        self.left_robot_arm = xArm7(self.model, self.data, 'xarm7_left')
+        self.right_robot_arm = xArm7(self.model, self.data, 'xarm7_right')
+        # self.left_robot_hand = AllegroHandV4(self.model, self.data, 'xarm7_left/allegro_left')
+        # self.right_robot_hand = AllegroHandV4(self.model, self.data 'xarm7_right/allegro_right')
+        self.left_robot_hand = InspireRH56DFTP(self.model, self.data, 'xarm7_left/inspire_rh56dftp_left')
+        self.right_robot_hand = InspireRH56DFTP(self.model, self.data, 'xarm7_right/inspire_rh56dftp_right')
 
         self.grasping_area_pos = self.model.site('grasping_area').pos
         self.grasping_area_size = self.model.site('grasping_area').size
         self.grasping_area = [(self.grasping_area_pos[i] - self.grasping_area_size[i],
                                self.grasping_area_pos[i] + self.grasping_area_size[i]) for i in range(2)]
+        
+        self.barcode_scanner_body_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, self.BARCODE_SCANNER_BODY_NAME)
+
+        self.ycb_object_body_ids = [mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, name) for name in self.YCB_OBJECT_BODY_NAMES]
 
     def reset(self):
         initial_sate = self.model.key('initial_state').id
         mujoco.mj_resetDataKeyframe(self.model, self.data, initial_sate)
         # self.spawn_ycb_object()
+        mujoco.mj_step(self.model, self.data, nstep=1000) # TODO: edit
         observation = self._get_observation()
 
         return observation
@@ -54,21 +61,26 @@ class DualArmEnv:
         right_robot_arm_q_pos = self.right_robot_arm.get_q_pos() # (7,)
         left_robot_hand_q_pos = self.left_robot_hand.get_q_pos() # (16,)
         right_robot_hand_q_pos = self.right_robot_hand.get_q_pos() # (16,)
-        barcode_scanner_pose = np.concatenate([ # (7,)
-            self.data.body(self.BARCODE_SCANNER_NAME).xpos.copy(), # (3,)
-            self.data.body(self.BARCODE_SCANNER_NAME).xquat.copy() # (4,)
-        ])
-        ycb_object_pose_list = []
-        for ycb_object_name in self.YCB_OBJECT_NAME_LIST:
-            ycb_object_pose = np.concatenate([ # (7,)
-                self.data.body(ycb_object_name).xpos.copy(), # (3,)
-                self.data.body(ycb_object_name).xquat.copy() # (4,)
-            ])
-            ycb_object_pose_list.append(ycb_object_pose)
+
+        barcode_scanner_pose = np.empty(7) # (7,)
+        barcode_scanner_pose[:3] = self.data.xpos[self.barcode_scanner_body_id].copy()
+        barcode_scanner_pose[3:] = self.data.xquat[self.barcode_scanner_body_id].copy()
+
+        ycb_object_poses = np.empty((len(self.ycb_object_body_ids), 7)) # (7,)
+        for i, ycb_objetc_body_id in enumerate(self.ycb_object_body_ids):
+            ycb_object_poses[i, :3] = self.data.xpos[ycb_objetc_body_id].copy()
+            ycb_object_poses[i, 3:] = self.data.xquat[ycb_objetc_body_id].copy()
+
         # TODO: Add tactile(force) data
 
-        return {'barcode_scanner_pose': barcode_scanner_pose,
-                'ycb_object_pose_list': ycb_object_pose_list}
+        return {
+            'left_robot_arm_q_pos': left_robot_arm_q_pos,
+            'right_robot_arm_q_pos': right_robot_arm_q_pos,
+            'left_robot_hand_q_pos': left_robot_hand_q_pos,
+            'right_robot_hand_q_pos': right_robot_hand_q_pos,
+            'barcode_scanner_pose': barcode_scanner_pose,
+            'ycb_object_poses': ycb_object_poses
+        }
 
     def _get_reward(self):
         return None
