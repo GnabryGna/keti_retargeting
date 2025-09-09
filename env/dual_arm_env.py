@@ -1,3 +1,6 @@
+from datetime import datetime
+
+import imageio.v2 as imageio
 import mujoco
 import numpy as np
 
@@ -18,7 +21,7 @@ class DualArmEnv:
         '021_bleach_cleanser/021_bleach_cleanser'
     ]
 
-    def __init__(self):
+    def __init__(self, save_video=False):
         mjcf = dual_arm_mjcf.load()
         self.model = mjcf.compile()
         self.data = mujoco.MjData(self.model)
@@ -36,27 +39,54 @@ class DualArmEnv:
                                self.grasping_area_pos[i] + self.grasping_area_size[i]) for i in range(2)]
         
         self.barcode_scanner_body_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, self.BARCODE_SCANNER_BODY_NAME)
-
         self.ycb_object_body_ids = [mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, name) for name in self.YCB_OBJECT_BODY_NAMES]
+
+        self.save_video = save_video
+        self.writer = None
+        if self.save_video:
+            self.video_fps = 60
+            self.frame_dt = 1.0/self.video_fps
+            self.next_frame_time = 0.0
+            width = self.model.vis.global_.offwidth
+            height = self.model.vis.global_.offheight
+            self.renderer = mujoco.Renderer(self.model, width=width, height=height)
 
     def reset(self):
         initial_sate = self.model.key('initial_state').id
         mujoco.mj_resetDataKeyframe(self.model, self.data, initial_sate)
         # self.spawn_ycb_object()
-        mujoco.mj_step(self.model, self.data, nstep=1000) # TODO: edit
-        observation = self._get_observation()
+        mujoco.mj_step(self.model, self.data, nstep=1000) # TODO: adjust settle steps
+        observation = self.get_observation()
+
+        if self.save_video:
+            if self.writer is not None:
+                self.writer.close()
+            timestamp = datetime.now().strftime('%y%m%d_%H_%M_%S')
+            filename = f'{timestamp}.mp4'
+            self.writer = imageio.get_writer(filename, fps=self.video_fps, codec="libx264", pixelformat="yuv420p", macro_block_size=None)
+            self.next_frame_time = self.data.time
 
         return observation
 
     def step(self, action):
-        mujoco.mj_step(self.model, self.data, nstep=1)
+        # self.left_robot_arm.servoj(action['left_robot_arm_q_pos'])
+        # self.right_robot_arm.servoj(action['right_robot_arm_q_pos'])
+        # self.left_robot_hand.servoj(action['left_robot_hand_q_pos'])
+        # self.right_robot_hand.servoj(action['right_robot_hand_q_pos'])
+        mujoco.mj_step(self.model, self.data)
+        observation = self.get_observation()
+        reward = self.get_reward()
 
-        observation = self._get_observation()
-        reward = self._get_reward()
+        if self.save_video:
+            if self.data.time >= self.next_frame_time:
+                self.renderer.update_scene(self.data)
+                frame = self.renderer.render()
+                self.writer.append_data(frame)
+                self.next_frame_time += self.frame_dt
 
         return observation, reward
     
-    def _get_observation(self):
+    def get_observation(self):
         left_robot_arm_q_pos = self.left_robot_arm.get_q_pos() # (7,)
         right_robot_arm_q_pos = self.right_robot_arm.get_q_pos() # (7,)
         left_robot_hand_q_pos = self.left_robot_hand.get_q_pos() # (16,)
@@ -82,8 +112,13 @@ class DualArmEnv:
             'ycb_object_poses': ycb_object_poses
         }
 
-    def _get_reward(self):
+    def get_reward(self):
         return None
+    
+    def close(self):
+        if self.save_video:
+            self.renderer.close()
+            self.writer.close()
 
     def spawn_ycb_object(self, settle_steps=1000):
         nonoverlap_xy_pos_dict = self.sample_nonoverlap_xy_pos(self.grasping_area[0], self.grasping_area[1])

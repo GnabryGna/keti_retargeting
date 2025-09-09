@@ -19,7 +19,7 @@
   </worldbody>
 
   <visual>
-    <global azimuth="-90" elevation="-30"/>
+    <global azimuth="-90" elevation="-30" offwidth="1920" offheight="1080"/>
     <quality shadowsize="16384"/>
     <headlight diffuse="0.6 0.6 0.6" specular="0 0 0"/>
     <rgba haze="0.15 0.25 0.35 1"/>
