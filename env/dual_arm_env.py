@@ -11,8 +11,8 @@ from env.robot import xArm7
 
 
 class DualArmEnv:
-    BARCODE_SCANNER_BODY_NAME = 'barcode_scanner/barcode_scanner'
-    YCB_OBJECT_BODY_NAMES = [
+    BARCODE_SCANNER_NAME = 'barcode_scanner/barcode_scanner'
+    YCB_OBJECT_NAMES = [
         '003_cracker_box/003_cracker_box',
         '004_sugar_box/004_sugar_box',
         '005_tomato_soup_can/005_tomato_soup_can',
@@ -38,8 +38,8 @@ class DualArmEnv:
         self.grasping_area = [(self.grasping_area_pos[i] - self.grasping_area_size[i],
                                self.grasping_area_pos[i] + self.grasping_area_size[i]) for i in range(2)]
         
-        self.barcode_scanner_body_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, self.BARCODE_SCANNER_BODY_NAME)
-        self.ycb_object_body_ids = [mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, name) for name in self.YCB_OBJECT_BODY_NAMES]
+        self.barcode_scanner_body_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, self.BARCODE_SCANNER_NAME)
+        self.ycb_object_body_ids = [mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, name) for name in self.YCB_OBJECT_NAMES]
 
         self.save_video = save_video
         self.writer = None
@@ -47,15 +47,15 @@ class DualArmEnv:
             self.video_fps = 60
             self.frame_dt = 1.0/self.video_fps
             self.next_frame_time = 0.0
-            width = self.model.vis.global_.offwidth
-            height = self.model.vis.global_.offheight
+            width = self.model.vis.global_.offwidth # 1920
+            height = self.model.vis.global_.offheight # 1080
             self.renderer = mujoco.Renderer(self.model, width=width, height=height)
 
     def reset(self):
         initial_sate = self.model.key('initial_state').id
         mujoco.mj_resetDataKeyframe(self.model, self.data, initial_sate)
-        # self.spawn_ycb_object()
-        mujoco.mj_step(self.model, self.data, nstep=1000) # TODO: adjust settle steps
+        self.spawn_ycb_object()
+        mujoco.mj_step(self.model, self.data, nstep=3000)
         observation = self.get_observation()
 
         if self.save_video:
@@ -101,7 +101,7 @@ class DualArmEnv:
             ycb_object_poses[i, :3] = self.data.xpos[ycb_objetc_body_id].copy()
             ycb_object_poses[i, 3:] = self.data.xquat[ycb_objetc_body_id].copy()
 
-        # TODO: Add tactile(force) data
+        # TODO: Add tactile/force data
 
         return {
             'left_robot_arm_q_pos': left_robot_arm_q_pos,
@@ -120,76 +120,64 @@ class DualArmEnv:
             self.renderer.close()
             self.writer.close()
 
-    def spawn_ycb_object(self, settle_steps=1000):
-        nonoverlap_xy_pos_dict = self.sample_nonoverlap_xy_pos(self.grasping_area[0], self.grasping_area[1])
+    def spawn_ycb_object(self):
+        nonoverlap_pos_dict = self.sample_nonoverlap_pos(self.grasping_area[0], self.grasping_area[1])
 
-        for ycb_object_name, xy_pos in nonoverlap_xy_pos_dict.items():
-            x = xy_pos[0]
-            y = xy_pos[1]
-            z = 0.12
-            pos = np.array([x, y, z])
-
-            # yaw = np.random.uniform(-np.pi, np.pi)
+        for ycb_object_name, pos in nonoverlap_pos_dict.items():
+            yaw = np.random.uniform(-np.pi, np.pi)
+            quat = [np.cos(yaw*0.5), 0, 0, np.sin(yaw*0.5)]
 
             qpos_adr = self.model.joint(ycb_object_name).qposadr.item()
             dof_adr = self.model.joint(ycb_object_name).dofadr.item()
             
             self.data.qpos[qpos_adr:qpos_adr + 3] = pos
-            # self.data.qpos[qpos_adr + 3:qpos_adr + 7] = quat
+            self.data.qpos[qpos_adr + 3:qpos_adr + 7] = quat
             self.data.qvel[dof_adr:dof_adr + 6] = 0.0
-
 
         mujoco.mj_forward(self.model, self.data)
 
-        # for _ in range(settle_steps):
-            # mujoco.mj_step(self.model, self.data, nstep=1)
+    def sample_nonoverlap_pos(self, x_range, y_range, max_tries=1000):
+        radius_dict = {}
+        z_dict= {}
+        for ycb_object_name in self.YCB_OBJECT_NAMES:
+            quat = self.model.geom(ycb_object_name).quat
+            rotation = np.empty(9)
+            mujoco.mju_quat2Mat(rotation, quat)
+            rotation = rotation.reshape(3, 3)
+            geom_size = np.abs(rotation) @ self.model.geom(ycb_object_name).size
             
-    def sample_random_pose(self, x_range, y_range, z_range):
-        x = np.random.uniform(x_range[0], x_range[1])
-        y = np.random.uniform(y_range[0], y_range[1])
-        z = np.random.uniform(z_range[0], z_range[1])
-        pos = np.array([x, y, z])
+            radius_dict[ycb_object_name] = max(geom_size[:2])
+            z_dict[ycb_object_name] = geom_size[2]
 
-        # Shoemake/Marsaglia method
-        u1, u2, u3 = np.random.random(3)
-        quat = np.array([ # [w, x, y, z]
-            np.sqrt(u1)*np.cos(2*np.pi*u3),
-            np.sqrt(1 - u1)*np.sin(2*np.pi*u2),
-            np.sqrt(1 - u1)*np.cos(2*np.pi*u2),
-            np.sqrt(u1)*np.sin(2*np.pi*u3)
-        ])
+        order = sorted(radius_dict.keys(), key=lambda k: -radius_dict[k])
 
-        return pos, quat
-    
-    # def sample_random_pose_upright(self, x_range, y_range):
-    #     x = np.random.uniform(x_range[0], x_range[1])
-    #     y = np.random.uniform(y_range[0], y_range[1])
-    #     z = table_z + lift                     # 테이블 바로 위에 놓기
-    #     yaw = np.random.uniform(-np.pi, np.pi) # yaw만 랜덤
-    #     c, s = np.cos(yaw/2), np.sin(yaw/2)
-    #     quat = np.array([c, 0.0, 0.0, s])  # (w,x,y,z)
-    #     return np.array([x, y, z]), quat
+        nonoverlap_pos_dict = {} # {ycb_object_name:[x, y, z]}
 
-    def sample_nonoverlap_xy_pos(self, x_range, y_range, max_tries=1000):
-        radius_dict = {ycb_object_name: float(self.model.geom(ycb_object_name).rbound)*0.01 for ycb_object_name in self.YCB_OBJECT_BODY_NAMES}
-        nonoverlap_xy_pos_dict = {} # {ycb_object_name:[x, y]}
-        tries = 0
+        for name in order:
+            radius = radius_dict[name]
+            x_min, x_max = x_range[0] + radius, x_range[1] - radius
+            y_min, y_max = y_range[0] + radius, y_range[1] - radius
 
-        for i, radius in radius_dict.items():
-            overlap = False
+            placed = False
+            tries = 0
             while tries < max_tries:
                 tries += 1
-                xy_pos_candidate = np.array([np.random.uniform(x_range[0] + radius, x_range[1] - radius),
-                                             np.random.uniform(y_range[0] + radius, y_range[1] - radius)])
-                for j, xy_pos in nonoverlap_xy_pos_dict.items():
-                    if np.linalg.norm(xy_pos_candidate - xy_pos) < (radius + radius_dict[j]):
+                overlap = False
+
+                xy_pos_candidate = np.array([np.random.uniform(x_min, x_max), np.random.uniform(y_min, y_max)])
+                
+                for j, pos in nonoverlap_pos_dict.items():
+                    if np.linalg.norm(xy_pos_candidate - pos[:2]) < (radius + radius_dict[j]):
                         overlap = True
                         break
-                if overlap == False:
-                    nonoverlap_xy_pos_dict[i] = xy_pos_candidate
+
+                if not overlap:
+                    z = z_dict[name]
+                    nonoverlap_pos_dict[name] = np.array([xy_pos_candidate[0], xy_pos_candidate[1], z])
+                    placed = True
                     break
             
-            if overlap == True:
-                raise RuntimeError('Failed to place object without overlap.')
+            if not placed:
+                raise RuntimeError(f'Failed to place object without overlap: {name}')
         
-        return nonoverlap_xy_pos_dict
+        return nonoverlap_pos_dict
