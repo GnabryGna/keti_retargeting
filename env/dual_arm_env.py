@@ -171,7 +171,7 @@ class DualArmEnv:
     #     return np.array([x, y, z]), quat
 
     def sample_nonoverlap_xy_pos(self, x_range, y_range, max_tries=1000):
-        radius_dict = {ycb_object_name:float(self.model.geom(ycb_object_name).rbound)*0.01 for ycb_object_name in self.YCB_OBJECT_NAME_LIST} # {ycb_object_name:radius}
+        radius_dict = {ycb_object_name: float(self.model.geom(ycb_object_name).rbound)*0.01 for ycb_object_name in self.YCB_OBJECT_BODY_NAMES}
         nonoverlap_xy_pos_dict = {} # {ycb_object_name:[x, y]}
         tries = 0
 

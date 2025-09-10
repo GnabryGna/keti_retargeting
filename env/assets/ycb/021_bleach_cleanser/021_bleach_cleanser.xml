@@ -6,7 +6,7 @@
       <geom group="2" type="mesh" contype="0" conaffinity="0"/>
     </default>
     <default class="collision">
-      <geom group="3" type="mesh" mass="0"/>
+      <geom group="3" type="mesh" condim="6" mass="0"/>
     </default>
   </default>
   
@@ -21,12 +21,12 @@
   
   <worldbody>
     <body name="021_bleach_cleanser">
-      <freejoint name="joint"/>
+      <joint name="021_bleach_cleanser" type='free' damping="0.01"/>
       <geom name="021_bleach_cleanser" material="material_0" mesh="021_bleach_cleanser" class="visual" mass="1.131"/>
       <geom mesh="021_bleach_cleanser_collision_0" rgba="0.2697875768445831 0.7157183599505103 0.6937210083982738 1" class="collision"/>
       <geom mesh="021_bleach_cleanser_collision_1" rgba="0.4930167677348418 0.7188076252047975 0.5595617720830183 1" class="collision"/>
       <geom mesh="021_bleach_cleanser_collision_2" rgba="0.15539648731582867 0.49511481047602446 0.1646943184743862 1" class="collision"/>
-      <site name="barcode" pos="-0.031735 -0.01317 -0.073959" quat="-0.5 -0.5 0.5 0.5" group="4" rgba="1 0 0 1"/>
+      <site name="barcode" group="4" rgba="1 0 0 1" pos="-0.031735 -0.01317 -0.073959" quat="-0.5 -0.5 0.5 0.5" />
     </body>
   </worldbody>
 </mujoco>

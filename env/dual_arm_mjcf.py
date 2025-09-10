@@ -153,9 +153,6 @@ def load():
     # Barcode scanner
     barcode_scanner_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'barcode_scanner', 'barcode_scanner.xml')
     barcode_scanner = mujoco.MjSpec.from_file(barcode_scanner_xml_path)
-    # barcode_scanner.default.mesh.inertia = 'exact'
-    barcode_scanner.default.geom.condim = 6
-    barcode_scanner.default.geom.priority = 1
     barcode_scanner_attachment_frame = scene.worldbody.add_frame(pos=[-0.5, 0.45, 0.2],
                                                                  euler=[np.pi, 0, np.pi])
     scene.attach(child=barcode_scanner,
@@ -178,9 +175,6 @@ def load():
         xml_file_name = [file_name for file_name in file_names if file_name.lower().endswith('.xml')][0]
         ycb_object_xml_path = os.path.join(ycb_object_file_dir, ycb_object_name, xml_file_name)
         ycb_object = mujoco.MjSpec.from_file(ycb_object_xml_path)
-        # ycb_object.default.mesh.inertia = 'exact'
-        ycb_object.default.geom.condim = 6
-        ycb_object.default.geom.priority = 1
         ycb_object_attachment_frame = scene.worldbody.add_frame(pos=ycb_object_init_pose[id][:3],
                                                                 quat=ycb_object_init_pose[id][3:])
         scene.attach(child=ycb_object,

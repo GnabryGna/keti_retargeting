@@ -1,9 +1,9 @@
 <mujoco model="scene">
-  <option timestep="0.001" o_solref="0.002 1" integrator="implicit" cone="elliptic">
+  <option timestep="0.001" o_solref="0.002 1" integrator="implicitfast" cone="elliptic">
     <flag override="enable" multiccd="enable"/>
   </option>
 
-  <compiler autolimits="true" angle="radian" alignfree="true"/>
+  <compiler autolimits="true" angle="radian"/>
 
   <statistic extent="1.1" center="0 0 0.1"/>
 

@@ -1,13 +1,15 @@
 <mujoco model="robot_torso">
   <compiler meshdir="assets"/>
+  
   <default>
     <default class="visual">
       <geom group="2" type="mesh" contype="0" conaffinity="0"/>
     </default>
     <default class="collision">
-      <geom group="3" type="mesh"/>
+      <geom group="3" type="mesh" mass="0"/>
     </default>
   </default>
+  
   <asset>
     <mesh file="robot_torso.obj"/>
     <mesh file="robot_torso_collision_0.obj"/>
@@ -24,6 +26,7 @@
     <mesh file="robot_torso_collision_11.obj"/>
     <mesh file="robot_torso_collision_12.obj"/>
   </asset>
+  
   <worldbody>
     <body name="robot_torso">
       <geom mesh="robot_torso" class="visual" rgba="0.2 0.2 0.2 1"/>

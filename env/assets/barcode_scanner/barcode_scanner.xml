@@ -6,7 +6,7 @@
       <geom group="2" type="mesh" contype="0" conaffinity="0"/>
     </default>
     <default class="collision">
-      <geom group="3" type="mesh" mass="0"/>
+      <geom group="3" type="mesh" condim="6" mass="0"/>
     </default>
   </default>
   
@@ -112,7 +112,7 @@
   
   <worldbody>
     <body name="barcode_scanner">
-      <freejoint name="joint"/>
+      <joint name="barcode_scanner" type='free' damping="0.01"/>
       <geom material="material_0" mesh="barcode_scanner" class="visual" mass="0.16"/>
       <geom mesh="barcode_scanner_collision_0" rgba="0.19980927981823005 0.4288580357367924 0.23564255013610258 1" class="collision"/>
       <geom mesh="barcode_scanner_collision_1" rgba="0.2834961197168874 0.4891366295367552 0.9809570078447242 1" class="collision"/>
