@@ -6,38 +6,44 @@ class RobotArmBase:
     def __init__(self, model, data, joint_names, actuator_names, tcp_site_name):
         self.model = model
         self.data = data
-        self.joint_ids = [mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, joint_name) for joint_name in joint_names]
-        self.joint_qpos_adr = self.model.jnt_qposadr[self.joint_ids]
-        self.actuator_ids = [mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, actuator_name) for actuator_name in actuator_names]
-        self.tcp_site_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_SITE, tcp_site_name)
+        self.joint_names = joint_names
+        self.actuator_names = actuator_names
+        self.tcp_site_name = tcp_site_name
+
+        self.joint_ids = [mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, joint_name) for joint_name in joint_names]
+        self.actuator_ids = [mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, actuator_name) for actuator_name in actuator_names]
+        self.tcp_site_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, tcp_site_name)
+
+        self.joint_qpos_adr = model.jnt_qposadr[self.joint_ids]
+        self.joint_dof_adr = model.jnt_dofadr[self.joint_ids]
         
     def get_q_pos(self):
         return self.data.qpos[self.joint_qpos_adr].copy() # (njoint,)
     
     def get_q_vel(self):
-        return self.data.qvel[self.joint_qpos_adr].copy() # (njoint,)
+        return self.data.qvel[self.joint_dof_adr].copy() # (njoint,)
     
     def get_tcp_pose(self):
         pos = self.data.site_xpos[self.tcp_site_id].copy() # (3,)
         xmat = self.data.site_xmat[self.tcp_site_id].copy() # (9,)
         quat = np.empty(4)
         mujoco.mju_mat2Quat(quat, xmat) # [w, x, y, z]
-        return pos, quat
-    
-    def set_control(self, input):
-        self.data.ctrl[self.actuator_ids] = input
+        pose = np.concatenate([pos, quat])
+        return pose
     
     def set_q_pos(self, target_q_pos):
         self.data.qpos[self.joint_qpos_adr] = target_q_pos
-        self.set_control(target_q_pos)
+        self.data.ctrl[self.actuator_ids] = target_q_pos
         mujoco.mj_forward(self.model, self.data)
+        self.data.qfrc_applied[self.joint_dof_adr] = self.data.qfrc_bias[self.joint_dof_adr]
 
     def set_tcp_pose(self, target_tcp_pose):
         ik_result = self.qpos_from_site_pose(target_pos=target_tcp_pose[:3], target_quat=target_tcp_pose[3:])
-        self.set_q_pos(ik_result.qpos)
+        self.set_q_pos(ik_result['qpos'])
     
     def servoj(self, target_q_pos):
-        self.set_control(target_q_pos)
+        self.data.ctrl[self.actuator_ids] = target_q_pos
+        self.data.qfrc_applied[self.joint_dof_adr] = self.data.qfrc_bias[self.joint_dof_adr]
 
     def qpos_from_site_pose(
         self,
@@ -49,10 +55,8 @@ class RobotArmBase:
         regularization_strength=3e-2,
         max_update_norm=2.0,
         progress_thresh=20.0,
-        max_steps=100,
-        inplace=False
-    ):
-        
+        max_steps=100
+    ):  
         dtype = self.data.qpos.dtype
 
         if target_pos is not None and target_quat is not None:
@@ -79,27 +83,15 @@ class RobotArmBase:
             neg_site_xquat = np.empty(4, dtype=dtype)
             err_rot_quat = np.empty(4, dtype=dtype)
 
-        if not inplace:
-            work = mujoco.MjData(self.model)
-            work.qpos[:] = self.data.qpos
-            work.qvel[:] = self.data.qvel
-            if self.model.na > 0:
-                work.act[:] = self.data.act
-            d = work
-        else:
-            d = self.data
-
-        # Ensure that the Cartesian position of the site is up to date.
-        mujoco.mj_fwdPosition(self.model, d)
+        data = mujoco.MjData(self.model)
+        data.qpos[:] = self.data.qpos
+        mujoco.mj_fwdPosition(self.model, data)
 
         site_id = self.tcp_site_id
+        site_xpos = data.site_xpos[site_id]
+        site_xmat = data.site_xmat[site_id]
 
-        # These are views onto the underlying MuJoCo buffers. mj_fwdPosition will
-        # update them in place, so we can avoid indexing overhead in the main loop.
-        site_xpos = d.site_xpos[site_id]
-        site_xmat = d.site_xmat[site_id]
-
-        dof_indices = self.joint_ids
+        dof_indices = self.joint_dof_adr
 
         success = False
         steps = 0
@@ -108,37 +100,30 @@ class RobotArmBase:
             err_norm = 0.0
 
             if target_pos is not None:
-                # position error
                 err_pos[:] = target_pos - site_xpos
                 err_norm += float(np.linalg.norm(err_pos))
 
             if target_quat is not None:
-                # rotation error (quaternion)
                 mujoco.mju_mat2Quat(site_xquat, site_xmat)
                 mujoco.mju_negQuat(neg_site_xquat, site_xquat)
                 mujoco.mju_mulQuat(err_rot_quat, target_quat, neg_site_xquat)
                 mujoco.mju_quat2Vel(err_rot, err_rot_quat, 1)
-                err_norm += float(np.linalg.norm(err_rot) * rot_weight)
+                err_norm += float(np.linalg.norm(err_rot)*rot_weight)
 
             if err_norm < tol:
-                # print(f'Converged after {steps} steps: err_norm={err_norm:g}')
                 success = True
                 break
 
-            # Compute site Jacobian at current state
-            mujoco.mj_jacSite(self.model, d, jac_pos, jac_rot, site_id)
-            jac_joints = jac[:, dof_indices] if not isinstance(dof_indices, slice) else jac[:, dof_indices]
-
-            # Damped / regularized least-squares only when far from solution
+            mujoco.mj_jacSite(self.model, data, jac_pos, jac_rot, site_id)
+            jac_joints = jac[:, dof_indices]
             reg_strength = regularization_strength if err_norm > regularization_threshold else 0.0
             update_joints = self.nullspace_method(jac_joints, err, regularization_strength=reg_strength)
 
             update_norm = float(np.linalg.norm(update_joints))
             if update_norm <= 0.0:
-                # print(f'Stopping due to zero update at step {steps}')
+                print(f'Stopping due to zero update at step {steps}')
                 break
 
-            # progress heuristic: err_norm / ||update|| should remain small
             progress_criterion = err_norm / update_norm
             if progress_criterion > progress_thresh:
                 print(
@@ -147,30 +132,22 @@ class RobotArmBase:
                 )
                 break
 
-            # Cap step size
             if update_norm > max_update_norm:
                 update_joints *= (max_update_norm / update_norm)
 
-            # Scatter into full-size nv update vector
             update_nv[...] = 0.0
             update_nv[dof_indices] = update_joints
 
-            # Update qpos (handles quaternion joints properly)
-            mujoco.mj_integratePos(self.model, d.qpos, update_nv, 1)
+            mujoco.mj_integratePos(self.model, data.qpos, update_nv, 1)
+            mujoco.mj_fwdPosition(self.model, data)
 
-            # Recompute forward position for next loop
-            mujoco.mj_fwdPosition(self.model, d)
-
+            # For debug
             # print(f'Step {steps:2d}: err_norm={err_norm:<10.3g} update_norm={update_norm:<10.3g}')
 
         if not success and steps == max_steps - 1:
             print(f'Failed to converge after {max_steps} steps: err_norm={err_norm:g}')
 
-        # Return qpos snapshot (avoid dangling view)
-        if not inplace:
-            qpos = d.qpos.copy()
-        else:
-            qpos = d.qpos  # view is fine if we modified original in place
+        qpos = data.qpos[self.joint_qpos_adr].copy()
 
         return {'qpos': qpos, 'err_norm': err_norm, 'steps': steps, 'success': success}
 
@@ -178,7 +155,7 @@ class RobotArmBase:
         hess_approx = jac_joints.T @ jac_joints
         joint_delta = jac_joints.T @ delta
         if regularization_strength > 0.0:
-            hess_approx = hess_approx + np.eye(hess_approx.shape[0], dtype=hess_approx.dtype) * regularization_strength
+            hess_approx = hess_approx + np.eye(hess_approx.shape[0], dtype=hess_approx.dtype)*regularization_strength
             return np.linalg.solve(hess_approx, joint_delta)
         else:
             return np.linalg.lstsq(hess_approx, joint_delta, rcond=-1)[0]
@@ -230,29 +207,43 @@ class xArm7(RobotArmBase):
 
 
 class RobotHandBase:
-    def __init__(self, model, data, joint_names, actuator_names):
+    def __init__(self, model, data, joint_names, actuator_names, passive_joint_index=None):
         self.model = model
         self.data = data
-        self.joint_ids = [mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, joint_name) for joint_name in joint_names]
-        self.joint_qpos_adr = self.model.jnt_qposadr[self.joint_ids]
-        self.actuator_ids = [mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, actuator_name) for actuator_name in actuator_names]
+        self.joint_names = joint_names
+        self.actuator_names = actuator_names
+
+        self.joint_ids = [mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, joint_name) for joint_name in joint_names]
+        self.actuator_ids = [mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, actuator_name) for actuator_name in actuator_names]
+
+        self.joint_qpos_adr = model.jnt_qposadr[self.joint_ids]
+        self.joint_dof_adr = model.jnt_dofadr[self.joint_ids]
+
+        self.underactuated = len(joint_names) != len(actuator_names)
+        if self.underactuated:
+            self.passive_joint_index = passive_joint_index
 
     def get_q_pos(self):
         return self.data.qpos[self.joint_qpos_adr].copy() # (njoint,)
     
     def get_q_vel(self):
-        return self.data.qvel[self.joint_qpos_adr].copy() # (njoint,)
-    
-    def set_control(self, input):
-        self.data.ctrl[self.actuator_ids] = input
+        return self.data.qvel[self.joint_dof_adr].copy() # (njoint,)
     
     def set_q_pos(self, target_q_pos):
         self.data.qpos[self.joint_qpos_adr] = target_q_pos
+        if self.underactuated:
+            actuator_input = np.delete(target_q_pos, self.passive_joint_index)
+            self.data.ctrl[self.actuator_ids] = actuator_input
+        else:
+            self.data.ctrl[self.actuator_ids] = target_q_pos
         mujoco.mj_forward(self.model, self.data)
-        self.set_control(target_q_pos)
     
     def servoj(self, target_q_pos):
-        self.set_control(target_q_pos)
+        if self.underactuated:
+            actuator_input = np.delete(target_q_pos, self.passive_joint_index)
+            self.data.ctrl[self.actuator_ids] = actuator_input
+        else:
+            self.data.ctrl[self.actuator_ids] = target_q_pos
 
 
 class AllegroHandV4(RobotHandBase):
@@ -337,6 +328,7 @@ class InspireRH56DFTP(RobotHandBase):
         'ring_proximal',
         'little_proximal',
     ]
+    PASSIVE_JOINT_INDEX = [2, 3, 5, 7, 9, 11]
 
     def __init__(self, model, data, prefix=None):
         if prefix:
@@ -356,4 +348,4 @@ class InspireRH56DFTP(RobotHandBase):
             joint_names = self.JOINT_NAMES
             actuator_names = self.ACTUATOR_NAMES
         
-        super().__init__(model, data, joint_names, actuator_names)
+        super().__init__(model, data, joint_names, actuator_names, self.PASSIVE_JOINT_INDEX)

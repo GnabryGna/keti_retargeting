@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 import imageio.v2 as imageio
@@ -29,7 +30,7 @@ class DualArmEnv:
         self.left_robot_arm = xArm7(self.model, self.data, 'xarm7_left')
         self.right_robot_arm = xArm7(self.model, self.data, 'xarm7_right')
         # self.left_robot_hand = AllegroHandV4(self.model, self.data, 'xarm7_left/allegro_left')
-        # self.right_robot_hand = AllegroHandV4(self.model, self.data 'xarm7_right/allegro_right')
+        # self.right_robot_hand = AllegroHandV4(self.model, self.data, 'xarm7_right/allegro_right')
         self.left_robot_hand = InspireRH56DFTP(self.model, self.data, 'xarm7_left/inspire_rh56dftp_left')
         self.right_robot_hand = InspireRH56DFTP(self.model, self.data, 'xarm7_right/inspire_rh56dftp_right')
 
@@ -47,23 +48,27 @@ class DualArmEnv:
             self.video_fps = 60
             self.frame_dt = 1.0/self.video_fps
             self.next_frame_time = 0.0
-            width = self.model.vis.global_.offwidth # 1920
-            height = self.model.vis.global_.offheight # 1080
+            width = self.model.vis.global_.offwidth
+            height = self.model.vis.global_.offheight
             self.renderer = mujoco.Renderer(self.model, width=width, height=height)
 
     def reset(self):
         initial_sate = self.model.key('initial_state').id
         mujoco.mj_resetDataKeyframe(self.model, self.data, initial_sate)
+        
         self.spawn_ycb_object()
         mujoco.mj_step(self.model, self.data, nstep=3000)
+        
         observation = self.get_observation()
+
+        # self.right_robot_arm.set_tcp_pose([0.2, 0.4, 0.4, 0.7071068, -0.7071068, 0, 0])
 
         if self.save_video:
             if self.writer is not None:
                 self.writer.close()
-            timestamp = datetime.now().strftime('%y%m%d_%H_%M_%S')
-            filename = f'{timestamp}.mp4'
-            self.writer = imageio.get_writer(filename, fps=self.video_fps, codec="libx264", pixelformat="yuv420p", macro_block_size=None)
+            time_stamp = datetime.now().strftime('%y%m%d_%H_%M_%S')
+            file_path = os.path.join('logs', f'{time_stamp}.mp4')
+            self.writer = imageio.get_writer(file_path, fps=self.video_fps, codec="libx264", pixelformat="yuv420p", macro_block_size=None)
             self.next_frame_time = self.data.time
 
         return observation
@@ -89,8 +94,8 @@ class DualArmEnv:
     def get_observation(self):
         left_robot_arm_q_pos = self.left_robot_arm.get_q_pos() # (7,)
         right_robot_arm_q_pos = self.right_robot_arm.get_q_pos() # (7,)
-        left_robot_hand_q_pos = self.left_robot_hand.get_q_pos() # (16,)
-        right_robot_hand_q_pos = self.right_robot_hand.get_q_pos() # (16,)
+        left_robot_hand_q_pos = self.left_robot_hand.get_q_pos() # (16,) for allegro, (12,) for inspire
+        right_robot_hand_q_pos = self.right_robot_hand.get_q_pos() # (16,) for allegro, (12,) for inspire
 
         barcode_scanner_pose = np.empty(7) # (7,)
         barcode_scanner_pose[:3] = self.data.xpos[self.barcode_scanner_body_id].copy()
@@ -114,25 +119,21 @@ class DualArmEnv:
 
     def get_reward(self):
         return None
-    
-    def close(self):
-        if self.save_video:
-            self.renderer.close()
-            self.writer.close()
 
     def spawn_ycb_object(self):
         nonoverlap_pos_dict = self.sample_nonoverlap_pos(self.grasping_area[0], self.grasping_area[1])
 
         for ycb_object_name, pos in nonoverlap_pos_dict.items():
             yaw = np.random.uniform(-np.pi, np.pi)
-            quat = [np.cos(yaw*0.5), 0, 0, np.sin(yaw*0.5)]
+            quat = np.array([np.cos(yaw*0.5), 0, 0, np.sin(yaw*0.5)])
+            pose = np.concatenate([pos, quat])
 
-            qpos_adr = self.model.joint(ycb_object_name).qposadr.item()
-            dof_adr = self.model.joint(ycb_object_name).dofadr.item()
-            
-            self.data.qpos[qpos_adr:qpos_adr + 3] = pos
-            self.data.qpos[qpos_adr + 3:qpos_adr + 7] = quat
-            self.data.qvel[dof_adr:dof_adr + 6] = 0.0
+            joint_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, ycb_object_name)
+            joint_qpos_adr = self.model.jnt_qposadr[joint_id]
+            joint_qvel_adr = self.model.jnt_dofadr[joint_id]
+
+            self.data.qpos[joint_qpos_adr:joint_qpos_adr + 7] = pose
+            self.data.qvel[joint_qvel_adr:joint_qvel_adr + 6] = 0.0
 
         mujoco.mj_forward(self.model, self.data)
 
@@ -181,3 +182,10 @@ class DualArmEnv:
                 raise RuntimeError(f'Failed to place object without overlap: {name}')
         
         return nonoverlap_pos_dict
+    
+    # def set_state():
+    
+    def close(self):
+        if self.save_video:
+            self.renderer.close()
+            self.writer.close()

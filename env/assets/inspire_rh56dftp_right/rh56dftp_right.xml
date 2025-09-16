@@ -327,7 +327,7 @@
       <joint armature="0.001" damping="0.05" frictionloss="0.001"/>
       <default class="thumb_proximal_rotation">
         <joint axis="0 0 -1" range="0 1.1624"/>
-        <position ctrlrange="0 1.624"/>
+        <position ctrlrange="0 1.1624"/>
       </default>
       <default class="thumb_proximal_bending">
         <joint range="0 0.586"/>

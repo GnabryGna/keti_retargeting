@@ -3,6 +3,7 @@ import os
 import mujoco
 import numpy as np
 
+
 def load():
     # Scene
     scene_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'scene.xml')
@@ -36,7 +37,7 @@ def load():
     right_robot_arm_attachment_frame = scene.worldbody.add_frame(pos=[0.05692, 0, 0.44761],
                                                                  euler=[0, np.pi*5/9, np.pi/2])
     
-    # # Left robot hand (Allegro Hand V4)
+    # Left robot hand (Allegro Hand V4)
     # left_robot_hand_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'wonik_allegro', 'left_hand.xml')
     # left_robot_hand = mujoco.MjSpec.from_file(left_robot_hand_xml_path)
     # left_adaptor = left_robot_arm.body('link7').add_body(name='adaptor',
@@ -54,7 +55,7 @@ def load():
     #              prefix=left_robot_arm.modelname + '/',
     #              frame=left_robot_arm_attachment_frame)
     
-    # # Right robot hand (Allegro Hand V4)
+    # Right robot hand (Allegro Hand V4)
     # right_robot_hand_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'wonik_allegro', 'right_hand.xml')
     # right_robot_hand = mujoco.MjSpec.from_file(right_robot_hand_xml_path)
     # right_adaptor = right_robot_arm.body('link7').add_body(name='adaptor',
@@ -72,7 +73,7 @@ def load():
     #              prefix=right_robot_arm.modelname + '/',
     #              frame=right_robot_arm_attachment_frame)
 
-    # # Left robot hand (Inspire RH56DFTP)
+    # Left robot hand (Inspire RH56DFTP)
     left_robot_hand_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'inspire_rh56dftp_left', 'rh56dftp_left.xml')
     left_robot_hand = mujoco.MjSpec.from_file(left_robot_hand_xml_path)
     left_adaptor = left_robot_arm.body('link7').add_body(name='adaptor',
@@ -220,14 +221,9 @@ def load():
     )
     scene.add_key(name='initial_state', qpos=initial_qpos, ctrl=initial_ctrl)
 
-    model = scene.compile()
-    # data = mujoco.MjData(model)
-    scene.to_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dual_arm_mjcf.xml'))
-    # scene.to_zip(os.path.join(os.getcwd(), 'mjcf_model.zip'))
-    # mujoco.mj_printModel(model, 'model.txt')
-    # mujoco.mj_printData(model, data, 'data.txt')
-    # mujoco.mj_step(model, data, nstep=1000)
-    # viewer.launch(model, data)
+    scene.compile()
+
+    # For debugging
+    # scene.to_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dual_arm_mjcf.xml'))
 
     return scene
-
