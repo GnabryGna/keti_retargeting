@@ -1,6 +1,6 @@
 <mujoco model="scene">
-  <option timestep="0.001" o_solref="0.002 1" integrator="implicitfast" cone="elliptic">
-    <flag override="enable" multiccd="enable"/>
+  <option timestep="0.001" integrator="implicitfast" cone="elliptic">
+    <flag multiccd="enable"/>
   </option>
 
   <compiler autolimits="true" angle="radian"/>

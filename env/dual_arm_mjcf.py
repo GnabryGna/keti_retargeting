@@ -106,6 +106,35 @@ def load():
     scene.attach(child=right_robot_arm,
                  prefix=right_robot_arm.modelname + '/',
                  frame=right_robot_arm_attachment_frame)
+
+    # Box
+    box_width = 0.34
+    box_length = 0.25
+    box_height = 0.21
+    box_thickness = 0.005
+    box_rgba = [0.7, 0.6, 0.4, 1]
+    box = scene.worldbody.add_body(name='box',
+                                   pos=[-box_length/2 - 0.11, box_width/2 + 0.3, 0])
+    box.add_geom(type=mujoco.mjtGeom.mjGEOM_BOX,
+                 rgba=box_rgba,
+                 size=[box_length/2, box_width/2, box_thickness/2],
+                 pos=[0, 0, 0])
+    box.add_geom(type=mujoco.mjtGeom.mjGEOM_BOX,
+                 rgba=box_rgba,
+                 size=[box_thickness/2, box_width/2, box_height/2],
+                 pos=[box_length/2 - box_thickness/2, 0, box_height/2])
+    box.add_geom(type=mujoco.mjtGeom.mjGEOM_BOX,
+                 rgba=box_rgba,
+                 size=[box_thickness/2, box_width/2, box_height/2],
+                 pos=[-box_length/2 + box_thickness/2, 0, box_height/2])
+    box.add_geom(type=mujoco.mjtGeom.mjGEOM_BOX,
+                 rgba=box_rgba,
+                 size=[box_length/2 - box_thickness, box_thickness/2, box_height/2],
+                 pos=[0, -box_width/2 + box_thickness/2, box_height/2])
+    box.add_geom(type=mujoco.mjtGeom.mjGEOM_BOX,
+                 rgba=box_rgba,
+                 size=[box_length/2 - box_thickness, box_thickness/2, box_height/2],
+                 pos=[0, box_width/2 - box_thickness/2, box_height/2])
     
     # Object grasping area
     grasping_area_width = 0.34
@@ -113,71 +142,37 @@ def load():
     scene.worldbody.add_site(name='grasping_area',
                              type=mujoco.mjtGeom.mjGEOM_BOX,
                              group=4,
-                             pos=[0, 0.2 + grasping_area_width/2, 0],
+                             pos=[grasping_area_length/2 - 0.11, grasping_area_width/2 + 0.3, 0],
                              size=[grasping_area_length/2, grasping_area_width/2, 0.001],
                              rgba=[0, 1, 0, 1])
-
-    # Box
-    box_width = 0.25
-    box_length = 0.34
-    box_height = 0.205 # 실제 높이는 0.21 (box_height + box_thickness)
-    box_thickness = 0.005
-    box_rgba = [0.7, 0.6, 0.4, 1]
-    box = scene.worldbody.add_body(name='box',
-                                   pos=[0.36 + 0.125, 0.2 + 0.17, 0])
-    box.add_geom(name='base',
-                 type=mujoco.mjtGeom.mjGEOM_BOX,
-                 rgba=box_rgba,
-                 size=[box_width/2, box_length/2, box_thickness/2],
-                 pos=[0, 0, box_thickness/2])
-    box.add_geom(name='side_1',
-                 type=mujoco.mjtGeom.mjGEOM_BOX,
-                 rgba=box_rgba,
-                 size=[box_thickness/2, box_length/2, box_height/2],
-                 pos=[box_width/2 - box_thickness/2, 0, box_height/2 + box_thickness])
-    box.add_geom(name='side_2',
-                 type=mujoco.mjtGeom.mjGEOM_BOX,
-                 rgba=box_rgba,
-                 size=[box_width/2 - box_thickness, box_thickness/2, box_height/2],
-                 pos=[0, -box_length/2 + box_thickness/2, box_height/2 + box_thickness])
-    box.add_geom(name='side_3',
-                 type=mujoco.mjtGeom.mjGEOM_BOX,
-                 rgba=box_rgba,
-                 size=[box_thickness/2, box_length/2, box_height/2],
-                 pos=[-box_width/2 + box_thickness/2, 0, box_height/2 + box_thickness])
-    box.add_geom(name='side_4',
-                 type=mujoco.mjtGeom.mjGEOM_BOX,
-                 rgba=box_rgba,
-                 size=[box_width/2 - box_thickness, box_thickness/2, box_height/2],
-                 pos=[0, box_length/2 - box_thickness/2, box_height/2 + box_thickness])
     
     # Barcode scanner
     barcode_scanner_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'barcode_scanner', 'barcode_scanner.xml')
     barcode_scanner = mujoco.MjSpec.from_file(barcode_scanner_xml_path)
-    barcode_scanner_attachment_frame = scene.worldbody.add_frame(pos=[-0.5, 0.45, 0.2],
+    barcode_scanner_attachment_frame = scene.worldbody.add_frame(pos=[-0.5, 0.55, 0.2],
                                                                  euler=[np.pi, 0, np.pi])
     scene.attach(child=barcode_scanner,
                  prefix=barcode_scanner.modelname + '/',
                  frame=barcode_scanner_attachment_frame)
 
     # YCB object
-    ycb_object_init_pose = ( # [x, y, z, roll, pitch, yaw] relative to world frame
-        [0.1, 0.25, 0.12, 0.707107, 0, 0, 0.707107], # 003_cracker_box
-        [-0.1, 0.25, 0.12, 0.707107, 0, 0, 0.707107], # 004_sugar_box
-        [0.1, 0.35, 0.12, 0.707107, 0, 0, 0.707107], # 005_tomato_soup_can
-        [-0.1, 0.35, 0.12, 0.707107, 0, 0, 0.707107], # 006_mustard_bottle
-        [0.1, 0.45, 0.12, 0.707107, 0, 0, 0.707107], # 010_potted_meat_can
-        [-0.1, 0.45, 0.12, 0.707107, 0, 0, 0.707107] # 021_bleach_cleanser
-    )
+    ycb_object_init_pose = {
+        '003_cracker_box': [0.35, 0.37, 0.12, 0.707107, 0, 0, 0.707107],
+        '004_sugar_box': [0.15, 0.37, 0.12, 0.707107, 0, 0, 0.707107],
+        '005_tomato_soup_can': [0.35, 0.47, 0.12, 0.707107, 0, 0, 0.707107],
+        '006_mustard_bottle': [0.15, 0.47, 0.12, 0.707107, 0, 0, 0.707107],
+        '010_potted_meat_can': [0.35, 0.57, 0.12, 0.707107, 0, 0, 0.707107],
+        '021_bleach_cleanser': [0.15, 0.57, 0.12, 0.707107, 0, 0, 0.707107]
+    }
     ycb_object_file_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'ycb')
     ycb_object_name_list = os.listdir(ycb_object_file_dir)
-    for id, ycb_object_name in enumerate(ycb_object_name_list):
+    for ycb_object_name in ycb_object_name_list:
         file_names = os.listdir(os.path.join(ycb_object_file_dir, ycb_object_name))
-        xml_file_name = [file_name for file_name in file_names if file_name.lower().endswith('.xml')][0]
+        xml_file_name = next(file_name for file_name in file_names if file_name.lower().endswith('.xml'))
         ycb_object_xml_path = os.path.join(ycb_object_file_dir, ycb_object_name, xml_file_name)
         ycb_object = mujoco.MjSpec.from_file(ycb_object_xml_path)
-        ycb_object_attachment_frame = scene.worldbody.add_frame(pos=ycb_object_init_pose[id][:3],
-                                                                quat=ycb_object_init_pose[id][3:])
+        ycb_object_attachment_frame = scene.worldbody.add_frame(pos=ycb_object_init_pose[ycb_object_name][:3],
+                                                                quat=ycb_object_init_pose[ycb_object_name][3:])
         scene.attach(child=ycb_object,
                      prefix=ycb_object.modelname + '/',
                      frame=ycb_object_attachment_frame)
@@ -206,12 +201,12 @@ def load():
         + [0, 0, 0, np.pi/6, 0, 0, 0] # right arm
         + [0]*12 # right hand
         + [-0.14742, 0.484668, 0.496348, 0.411075, 0.231993, 0.544672, 0.693202] # barcode scanner
-        + [0.517, 0.253, 0.112, 0.707107, 0, 0, 0.707107] # 003_cracker_box
-        + [0.442, 0.340, 0.092, 0.707107, 0, 0, 0.707107] # 004_sugar_box
-        + [0.549, 0.334, 0.058, 0.707107, 0, 0, 0.707107] # 005_tomato_soup_can
-        + [0.543, 0.472, 0.085, 0.707107, 0, 0, 0.707107] # 006_mustard_bottle
-        + [0.542, 0.403, 0.048, 0.707107, 0, 0, 0.707107] # 010_potted_meat_can
-        + [0.423, 0.465, 0.110, 0.707107, 0, 0, 0.707107] # 021_bleach_cleanser
+        + [-0.203, 0.353, 0.112, 0.707107, 0, 0, 0.707107] # 003_cracker_box
+        + [-0.278, 0.440, 0.092, 0.707107, 0, 0, 0.707107] # 004_sugar_box
+        + [-0.171, 0.434, 0.058, 0.707107, 0, 0, 0.707107] # 005_tomato_soup_can
+        + [-0.177, 0.572, 0.085, 0.707107, 0, 0, 0.707107] # 006_mustard_bottle
+        + [-0.178, 0.503, 0.048, 0.707107, 0, 0, 0.707107] # 010_potted_meat_can
+        + [-0.297, 0.565, 0.110, 0.707107, 0, 0, 0.707107] # 021_bleach_cleanser
     )
     initial_ctrl = (
         [0, 0, 0, np.pi/6, 0, 0, np.pi/2] # left arm
@@ -224,6 +219,6 @@ def load():
     scene.compile()
 
     # For debugging
-    # scene.to_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dual_arm_mjcf.xml'))
+    scene.to_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dual_arm_mjcf.xml'))
 
     return scene

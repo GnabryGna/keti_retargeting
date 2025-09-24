@@ -23,10 +23,7 @@ def set_seed(seed):
     np.random.seed(seed)
 
 
-def run_bench(model, data, n_steps=10000, warmup_steps=1000):
-    for _ in range(warmup_steps):
-        mujoco.mj_step(model, data)
-
+def run_bench(model, data, n_steps=10000):
     dt_list = []
     ncon_list = []
     nefc_list = []
@@ -103,40 +100,39 @@ def site_matching_mesh_aabb(model, geom_name):
 if __name__ == '__main__':
     mjcf = dual_arm_mjcf.load()
     model = mjcf.compile()
-    # print(model.ngeom)
-    # data = mujoco.MjData(model)
+    data = mujoco.MjData(model)
 
-    # initial_sate = model.key('initial_state').id
-    # mujoco.mj_resetDataKeyframe(model, data, initial_sate)
-    # mujoco.mj_forward(model, data)
+    initial_sate = model.key('initial_state').id
+    mujoco.mj_resetDataKeyframe(model, data, initial_sate)
+    mujoco.mj_forward(model, data)
 
-    # result = run_bench(model, data)
-    # print(result)
+    result = run_bench(model, data)
+    print(result)
 
-    name_list = [
-        "palm_tactile_sensor",
-        "thumb_pad_tactile_sensor",
-        "thumb_middle_section_tactile_sensor",
-        "thumb_nail_tactile_sensor",
-        "thumb_tip_tactile_sensor",
-        "index_pad_tactile_sensor",
-        "index_nail_tactile_sensor",
-        "index_tip_tactile_sensor",
-        "middle_pad_tactile_sensor",
-        "middle_nail_tactile_sensor",
-        "middle_tip_tactile_sensor",
-        "ring_pad_tactile_sensor",
-        "ring_nail_tactile_sensor",
-        "ring_tip_tactile_sensor",
-        "little_pad_tactile_sensor",
-        "little_nail_tactile_sensor",
-        "little_tip_tactile_sensor"
-    ]
-    for name in name_list:
-        print(name)
-        geom_name = f'xarm7_left/inspire_rh56dftp_left/{name}'
-        site_matching_mesh_aabb(model, geom_name)
-        print('-'*50)
+    # name_list = [
+    #     "palm_tactile_sensor",
+    #     "thumb_pad_tactile_sensor",
+    #     "thumb_middle_section_tactile_sensor",
+    #     "thumb_nail_tactile_sensor",
+    #     "thumb_tip_tactile_sensor",
+    #     "index_pad_tactile_sensor",
+    #     "index_nail_tactile_sensor",
+    #     "index_tip_tactile_sensor",
+    #     "middle_pad_tactile_sensor",
+    #     "middle_nail_tactile_sensor",
+    #     "middle_tip_tactile_sensor",
+    #     "ring_pad_tactile_sensor",
+    #     "ring_nail_tactile_sensor",
+    #     "ring_tip_tactile_sensor",
+    #     "little_pad_tactile_sensor",
+    #     "little_nail_tactile_sensor",
+    #     "little_tip_tactile_sensor"
+    # ]
+    # for name in name_list:
+    #     print(name)
+    #     geom_name = f'xarm7_left/inspire_rh56dftp_left/{name}'
+    #     site_matching_mesh_aabb(model, geom_name)
+    #     print('-'*50)
     
     '''
     # Load data

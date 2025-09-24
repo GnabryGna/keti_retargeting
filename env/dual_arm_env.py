@@ -51,13 +51,13 @@ class DualArmEnv:
             width = self.model.vis.global_.offwidth
             height = self.model.vis.global_.offheight
             self.renderer = mujoco.Renderer(self.model, width=width, height=height)
-
+        
     def reset(self):
         initial_sate = self.model.key('initial_state').id
         mujoco.mj_resetDataKeyframe(self.model, self.data, initial_sate)
         
         self.spawn_ycb_object()
-        mujoco.mj_step(self.model, self.data, nstep=3000)
+        mujoco.mj_step(self.model, self.data, nstep=10000) # 10s
         
         observation = self.get_observation()
 
@@ -78,7 +78,7 @@ class DualArmEnv:
         # self.right_robot_arm.servoj(action['right_robot_arm_q_pos'])
         # self.left_robot_hand.servoj(action['left_robot_hand_q_pos'])
         # self.right_robot_hand.servoj(action['right_robot_hand_q_pos'])
-        mujoco.mj_step(self.model, self.data)
+        mujoco.mj_step(self.model, self.data, nstep=10) # 1/(0.001*10) = 100Hz
         observation = self.get_observation()
         reward = self.get_reward()
 

@@ -1,8 +1,8 @@
 <mujoco model="scene">
   <compiler angle="radian"/>
 
-  <option timestep="0.001" o_solref="0.002 1" integrator="implicitfast" cone="elliptic">
-    <flag override="enable" multiccd="enable"/>
+  <option timestep="0.001" integrator="implicitfast" cone="elliptic">
+    <flag multiccd="enable"/>
   </option>
 
   <size nkey="1"/>
@@ -153,7 +153,7 @@
         <geom type="mesh" contype="0" conaffinity="0" group="2"/>
       </default>
       <default class="003_cracker_box/collision">
-        <geom type="mesh" condim="6" group="3"/>
+        <geom type="mesh" condim="6" group="3" priority="1" solref="0.002"/>
       </default>
     </default>
     <default class="004_sugar_box/main">
@@ -161,7 +161,7 @@
         <geom type="mesh" contype="0" conaffinity="0" group="2"/>
       </default>
       <default class="004_sugar_box/collision">
-        <geom type="mesh" condim="6" group="3"/>
+        <geom type="mesh" condim="6" group="3" priority="1" solref="0.002"/>
       </default>
     </default>
     <default class="005_tomato_soup_can/main">
@@ -169,7 +169,7 @@
         <geom type="mesh" contype="0" conaffinity="0" group="2"/>
       </default>
       <default class="005_tomato_soup_can/collision">
-        <geom type="mesh" condim="6" group="3"/>
+        <geom type="mesh" condim="6" group="3" priority="1" solref="0.002"/>
       </default>
     </default>
     <default class="006_mustard_bottle/main">
@@ -177,7 +177,7 @@
         <geom type="mesh" contype="0" conaffinity="0" group="2"/>
       </default>
       <default class="006_mustard_bottle/collision">
-        <geom type="mesh" condim="6" group="3"/>
+        <geom type="mesh" condim="6" group="3" priority="1" solref="0.002"/>
       </default>
     </default>
     <default class="010_potted_meat_can/main">
@@ -185,7 +185,7 @@
         <geom type="mesh" contype="0" conaffinity="0" group="2"/>
       </default>
       <default class="010_potted_meat_can/collision">
-        <geom type="mesh" condim="6" group="3"/>
+        <geom type="mesh" condim="6" group="3" priority="1" solref="0.002"/>
       </default>
     </default>
     <default class="021_bleach_cleanser/main">
@@ -193,7 +193,7 @@
         <geom type="mesh" contype="0" conaffinity="0" group="2"/>
       </default>
       <default class="021_bleach_cleanser/collision">
-        <geom type="mesh" condim="6" group="3"/>
+        <geom type="mesh" condim="6" group="3" priority="1" solref="0.002"/>
       </default>
     </default>
   </default>
@@ -989,7 +989,7 @@
 
   <worldbody>
     <geom name="floor" size="0 0 0.05" pos="0 0 -0.75" type="plane" material="groundplane"/>
-    <site name="grasping_area" pos="0 0.37 0" size="0.36 0.17 0.001" group="4" type="box" rgba="0 1 0 1"/>
+    <site name="grasping_area" pos="0.25 0.47 0" size="0.36 0.17 0.001" group="4" type="box" rgba="0 1 0 1"/>
     <light pos="0 0 2" dir="0 0 -1" type="directional"/>
     <body name="table/table">
       <geom type="mesh" rgba="1 1 1 1" mesh="table/table"/>
@@ -1812,8 +1812,8 @@
         </body>
       </body>
     </body>
-    <body name="barcode_scanner/barcode_scanner" pos="-0.5 0.45 0.2" quat="0 0 -1 0">
-      <joint name="barcode_scanner/barcode_scanner" type="free" limited="false" actuatorfrclimited="false" damping="0.01"/>
+    <body name="barcode_scanner/barcode_scanner" pos="-0.5 0.55 0.2" quat="0 0 -1 0">
+      <joint name="barcode_scanner/barcode_scanner" type="free" limited="false" actuatorfrclimited="false" damping="0.001"/>
       <geom class="barcode_scanner/visual" mass="0.16" material="barcode_scanner/material_0" mesh="barcode_scanner/barcode_scanner"/>
       <geom class="barcode_scanner/collision" mass="0" rgba="0.199809 0.428858 0.235643 1" mesh="barcode_scanner/barcode_scanner_collision_0"/>
       <geom class="barcode_scanner/collision" mass="0" rgba="0.283496 0.489137 0.980957 1" mesh="barcode_scanner/barcode_scanner_collision_1"/>
@@ -1910,25 +1910,25 @@
       <geom class="barcode_scanner/collision" mass="0" rgba="0.275215 0.227223 0.960179 1" mesh="barcode_scanner/barcode_scanner_collision_92"/>
       <geom class="barcode_scanner/collision" mass="0" rgba="0.335215 0.43565 0.742197 1" mesh="barcode_scanner/barcode_scanner_collision_93"/>
     </body>
-    <body name="003_cracker_box/003_cracker_box" pos="0.1 0.25 0.12" quat="0.707107 0 0 0.707107">
+    <body name="003_cracker_box/003_cracker_box" pos="0.35 0.37 0.12" quat="0.707107 0 0 0.707107">
       <joint name="003_cracker_box/003_cracker_box" type="free" limited="false" actuatorfrclimited="false" damping="0.01"/>
       <geom name="003_cracker_box/003_cracker_box" class="003_cracker_box/visual" mass="0.411" material="003_cracker_box/material_0" mesh="003_cracker_box/003_cracker_box"/>
       <geom name="003_cracker_box/003_cracker_box_collision_0" class="003_cracker_box/collision" mass="0" mesh="003_cracker_box/003_cracker_box"/>
       <site name="003_cracker_box/barcode" pos="-0.010259 0.050995 -0.10498" quat="0 0.707107 0.707107 0" group="4" rgba="1 0 0 1"/>
     </body>
-    <body name="004_sugar_box/004_sugar_box" pos="-0.1 0.25 0.12" quat="0.707107 0 0 0.707107">
+    <body name="004_sugar_box/004_sugar_box" pos="0.15 0.37 0.12" quat="0.707107 0 0 0.707107">
       <joint name="004_sugar_box/004_sugar_box" type="free" limited="false" actuatorfrclimited="false" damping="0.01"/>
       <geom name="004_sugar_box/004_sugar_box" class="004_sugar_box/visual" mass="0.514" material="004_sugar_box/material_0" mesh="004_sugar_box/004_sugar_box"/>
       <geom name="004_sugar_box/004_sugar_box_collision_0" class="004_sugar_box/collision" mass="0" mesh="004_sugar_box/004_sugar_box"/>
       <site name="004_sugar_box/barcode" pos="0.004512 0.025381 -0.085659" quat="0 0.707107 0.707107 0" group="4" rgba="1 0 0 1"/>
     </body>
-    <body name="005_tomato_soup_can/005_tomato_soup_can" pos="0.1 0.35 0.12" quat="0.707107 0 0 0.707107">
+    <body name="005_tomato_soup_can/005_tomato_soup_can" pos="0.35 0.47 0.12" quat="0.707107 0 0 0.707107">
       <joint name="005_tomato_soup_can/005_tomato_soup_can" type="free" limited="false" actuatorfrclimited="false" damping="0.01"/>
       <geom name="005_tomato_soup_can/005_tomato_soup_can" class="005_tomato_soup_can/visual" mass="0.349" material="005_tomato_soup_can/material_0" mesh="005_tomato_soup_can/005_tomato_soup_can"/>
       <geom name="005_tomato_soup_can/005_tomato_soup_can_collision_0" class="005_tomato_soup_can/collision" mass="0" mesh="005_tomato_soup_can/005_tomato_soup_can"/>
       <site name="005_tomato_soup_can/barcode" pos="-0.025168 -0.023411 -0.028418" quat="0.653281 0.653281 -0.270598 -0.270598" group="4" rgba="1 0 0 1"/>
     </body>
-    <body name="006_mustard_bottle/006_mustard_bottle" pos="-0.1 0.35 0.12" quat="0.707107 0 0 0.707107">
+    <body name="006_mustard_bottle/006_mustard_bottle" pos="0.15 0.47 0.12" quat="0.707107 0 0 0.707107">
       <joint name="006_mustard_bottle/006_mustard_bottle" type="free" limited="false" actuatorfrclimited="false" damping="0.01"/>
       <geom name="006_mustard_bottle/006_mustard_bottle" class="006_mustard_bottle/visual" mass="0.603" material="006_mustard_bottle/material_0" mesh="006_mustard_bottle/006_mustard_bottle"/>
       <geom class="006_mustard_bottle/collision" mass="0" rgba="0.38821 0.576541 0.319387 1" mesh="006_mustard_bottle/006_mustard_bottle_collision_0"/>
@@ -1936,7 +1936,7 @@
       <geom class="006_mustard_bottle/collision" mass="0" rgba="0.689794 0.601882 0.298983 1" mesh="006_mustard_bottle/006_mustard_bottle_collision_2"/>
       <site name="006_mustard_bottle/barcode" pos="-0.026312 -0.000525 -0.043586" quat="0.5 0.5 -0.5 -0.5" group="4" rgba="1 0 0 1"/>
     </body>
-    <body name="010_potted_meat_can/010_potted_meat_can" pos="0.1 0.45 0.12" quat="0.707107 0 0 0.707107">
+    <body name="010_potted_meat_can/010_potted_meat_can" pos="0.35 0.57 0.12" quat="0.707107 0 0 0.707107">
       <joint name="010_potted_meat_can/010_potted_meat_can" type="free" limited="false" actuatorfrclimited="false" damping="0.01"/>
       <geom name="010_potted_meat_can/010_potted_meat_can" class="010_potted_meat_can/visual" mass="0.37" material="010_potted_meat_can/material_0" mesh="010_potted_meat_can/010_potted_meat_can"/>
       <geom class="010_potted_meat_can/collision" mass="0" rgba="0.140978 0.548728 0.740018 1" mesh="010_potted_meat_can/010_potted_meat_can_collision_0"/>
@@ -1972,7 +1972,7 @@
       <geom class="010_potted_meat_can/collision" mass="0" rgba="0.934273 0.881614 0.984901 1" mesh="010_potted_meat_can/010_potted_meat_can_collision_30"/>
       <site name="010_potted_meat_can/barcode" pos="-0.00522 -0.047954 0.005731" quat="0.5 0.5 -0.5 0.5" group="4" rgba="1 0 0 1"/>
     </body>
-    <body name="021_bleach_cleanser/021_bleach_cleanser" pos="-0.1 0.45 0.12" quat="0.707107 0 0 0.707107">
+    <body name="021_bleach_cleanser/021_bleach_cleanser" pos="0.15 0.57 0.12" quat="0.707107 0 0 0.707107">
       <joint name="021_bleach_cleanser/021_bleach_cleanser" type="free" limited="false" actuatorfrclimited="false" damping="0.01"/>
       <geom name="021_bleach_cleanser/021_bleach_cleanser" class="021_bleach_cleanser/visual" mass="1.131" material="021_bleach_cleanser/material_0" mesh="021_bleach_cleanser/021_bleach_cleanser"/>
       <geom class="021_bleach_cleanser/collision" mass="0" rgba="0.269788 0.715718 0.693721 1" mesh="021_bleach_cleanser/021_bleach_cleanser_collision_0"/>
@@ -1980,12 +1980,12 @@
       <geom class="021_bleach_cleanser/collision" mass="0" rgba="0.155396 0.495115 0.164694 1" mesh="021_bleach_cleanser/021_bleach_cleanser_collision_2"/>
       <site name="021_bleach_cleanser/barcode" pos="-0.031735 -0.01317 -0.073959" quat="-0.5 -0.5 0.5 0.5" group="4" rgba="1 0 0 1"/>
     </body>
-    <body name="box" pos="0.485 0.37 0">
-      <geom name="base" size="0.125 0.17 0.0025" pos="0 0 0.0025" type="box" rgba="0.7 0.6 0.4 1"/>
-      <geom name="side_1" size="0.0025 0.17 0.1025" pos="0.1225 0 0.1075" type="box" rgba="0.7 0.6 0.4 1"/>
-      <geom name="side_2" size="0.12 0.0025 0.1025" pos="0 -0.1675 0.1075" type="box" rgba="0.7 0.6 0.4 1"/>
-      <geom name="side_3" size="0.0025 0.17 0.1025" pos="-0.1225 0 0.1075" type="box" rgba="0.7 0.6 0.4 1"/>
-      <geom name="side_4" size="0.12 0.0025 0.1025" pos="0 0.1675 0.1075" type="box" rgba="0.7 0.6 0.4 1"/>
+    <body name="box" pos="-0.235 0.47 0">
+      <geom size="0.125 0.17 0.0025" type="box" rgba="0.7 0.6 0.4 1"/>
+      <geom size="0.0025 0.17 0.105" pos="0.1225 0 0.105" type="box" rgba="0.7 0.6 0.4 1"/>
+      <geom size="0.0025 0.17 0.105" pos="-0.1225 0 0.105" type="box" rgba="0.7 0.6 0.4 1"/>
+      <geom size="0.12 0.0025 0.105" pos="0 -0.1675 0.105" type="box" rgba="0.7 0.6 0.4 1"/>
+      <geom size="0.12 0.0025 0.105" pos="0 0.1675 0.105" type="box" rgba="0.7 0.6 0.4 1"/>
     </body>
   </worldbody>
 
@@ -2086,6 +2086,6 @@
   </sensor>
 
   <keyframe>
-    <key name="initial_state" qpos="0 0 0 0.523599 0 0 1.5708 1.1624 0 0 0 1.25 1.35 1.25 1.35 1.25 1.35 1.25 1.35 0 0 0 0.523599 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.147519 0.484895 0.49225 0.403082 0.228236 0.547085 0.697231 0.517 0.253 0.112 0.707107 0 0 0.707107 0.442 0.34 0.092 0.707107 0 0 0.707107 0.549 0.334 0.058 0.707107 0 0 0.707107 0.543 0.472 0.085 0.707107 0 0 0.707107 0.542 0.403 0.048 0.707107 0 0 0.707107 0.423 0.465 0.11 0.707107 0 0 0.707107" ctrl="0 0 0 0.523599 0 0 1.5708 1.1624 0 1.4244 1.4244 1.4244 1.4244 0 0 0 0.523599 0 0 0 0 0 0 0 0 0"/>
+    <key name="initial_state" qpos="0 0 0 0.523599 0 0 1.5708 1.1624 0 0 0 1.25 1.35 1.25 1.35 1.25 1.35 1.25 1.35 0 0 0 0.523599 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.14742 0.484668 0.496348 0.411075 0.231993 0.544672 0.693202 -0.203 0.353 0.112 0.707107 0 0 0.707107 -0.278 0.44 0.092 0.707107 0 0 0.707107 -0.171 0.434 0.058 0.707107 0 0 0.707107 -0.177 0.572 0.085 0.707107 0 0 0.707107 -0.178 0.503 0.048 0.707107 0 0 0.707107 -0.297 0.565 0.11 0.707107 0 0 0.707107" ctrl="0 0 0 0.523599 0 0 1.5708 1.1624 0 1.4244 1.4244 1.4244 1.4244 0 0 0 0.523599 0 0 0 0 0 0 0 0 0"/>
   </keyframe>
 </mujoco>

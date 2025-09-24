@@ -112,7 +112,7 @@
   
   <worldbody>
     <body name="barcode_scanner">
-      <joint name="barcode_scanner" type='free' damping="0.01"/>
+      <joint name="barcode_scanner" type='free' damping="0.001"/>
       <geom material="material_0" mesh="barcode_scanner" class="visual" mass="0.16"/>
       <geom mesh="barcode_scanner_collision_0" rgba="0.19980927981823005 0.4288580357367924 0.23564255013610258 1" class="collision"/>
       <geom mesh="barcode_scanner_collision_1" rgba="0.2834961197168874 0.4891366295367552 0.9809570078447242 1" class="collision"/>

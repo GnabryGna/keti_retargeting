@@ -16,8 +16,8 @@ viewer.launch(env.model, env.data)
 #     observation = env.reset()
 #     while viewer.is_running():
 #         action = None
-#         next_observation, reward= env.step(action)
+#         next_observation, reward = env.step(action)
 #         observation = next_observation
 #         viewer.sync()
 
-# env.close()   
+# env.close()
