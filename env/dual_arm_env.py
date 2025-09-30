@@ -6,8 +6,8 @@ import mujoco
 import numpy as np
 
 from env import dual_arm_mjcf
-# from env.robot import AllegroHandV4
-from env.robot import InspireRH56DFTP
+from env.robot import AllegroHandV4
+# from env.robot import InspireRH56DFTP
 from env.robot import xArm7
 
 
@@ -29,10 +29,10 @@ class DualArmEnv:
 
         self.left_robot_arm = xArm7(self.model, self.data, 'xarm7_left')
         self.right_robot_arm = xArm7(self.model, self.data, 'xarm7_right')
-        # self.left_robot_hand = AllegroHandV4(self.model, self.data, 'xarm7_left/allegro_left')
-        # self.right_robot_hand = AllegroHandV4(self.model, self.data, 'xarm7_right/allegro_right')
-        self.left_robot_hand = InspireRH56DFTP(self.model, self.data, 'xarm7_left/inspire_rh56dftp_left')
-        self.right_robot_hand = InspireRH56DFTP(self.model, self.data, 'xarm7_right/inspire_rh56dftp_right')
+        self.left_robot_hand = AllegroHandV4(self.model, self.data, 'xarm7_left/allegro_left')
+        self.right_robot_hand = AllegroHandV4(self.model, self.data, 'xarm7_right/allegro_right')
+        # self.left_robot_hand = InspireRH56DFTP(self.model, self.data, 'xarm7_left/inspire_rh56dftp_left')
+        # self.right_robot_hand = InspireRH56DFTP(self.model, self.data, 'xarm7_right/inspire_rh56dftp_right')
 
         self.grasping_area_pos = self.model.site('grasping_area').pos
         self.grasping_area_size = self.model.site('grasping_area').size
@@ -43,6 +43,7 @@ class DualArmEnv:
         self.ycb_object_body_ids = [mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, name) for name in self.YCB_OBJECT_NAMES]
 
         self.save_video = save_video
+        # TODO: to utils.py
         self.writer = None
         if self.save_video:
             self.video_fps = 60

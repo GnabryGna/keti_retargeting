@@ -38,74 +38,74 @@ def load():
                                                                  euler=[0, np.pi*5/9, np.pi/2])
     
     # Left robot hand (Allegro Hand V4)
-    # left_robot_hand_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'wonik_allegro', 'left_hand.xml')
-    # left_robot_hand = mujoco.MjSpec.from_file(left_robot_hand_xml_path)
-    # left_adaptor = left_robot_arm.body('link7').add_body(name='adaptor',
-    #                                                      pos=[0, 0, 0.01])
-    # left_adaptor.add_geom(type=mujoco.mjtGeom.mjGEOM_CYLINDER,
-    #                       size=[0.03773072, 0.005, 0], # TODO: 3번째 값은 필요 없음 (mujoco 오류?)
-    #                       rgba=[0.2, 0.2, 0.2, 1],
-    #                       pos=[0, 0, -0.005])
-    # left_robot_hand_attachment_frame = left_adaptor.add_frame(pos=[0, 0, 0.095],
-    #                                                           euler=[0, -np.pi/2, 0])
-    # left_robot_arm.attach(child=left_robot_hand,
-    #                       prefix=left_robot_hand.modelname + '/',
-    #                       frame=left_robot_hand_attachment_frame)
-    # scene.attach(child=left_robot_arm,
-    #              prefix=left_robot_arm.modelname + '/',
-    #              frame=left_robot_arm_attachment_frame)
-    
-    # Right robot hand (Allegro Hand V4)
-    # right_robot_hand_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'wonik_allegro', 'right_hand.xml')
-    # right_robot_hand = mujoco.MjSpec.from_file(right_robot_hand_xml_path)
-    # right_adaptor = right_robot_arm.body('link7').add_body(name='adaptor',
-    #                                                        pos=[0, 0, 0.01])
-    # right_adaptor.add_geom(type=mujoco.mjtGeom.mjGEOM_CYLINDER,
-    #                        size=[0.03773072, 0.005, 0], # TODO: 3번째 값은 필요 없음 (mujoco 오류?)
-    #                        rgba=[0.2, 0.2, 0.2, 1],
-    #                        pos=[0, 0, -0.005])
-    # right_robot_hand_attachment_frame = right_adaptor.add_frame(pos=[0, 0, 0.095],
-    #                                                             euler=[0, -np.pi/2, 0])
-    # right_robot_arm.attach(child=right_robot_hand,
-    #                        prefix=right_robot_hand.modelname + '/',
-    #                        frame=right_robot_hand_attachment_frame)
-    # scene.attach(child=right_robot_arm,
-    #              prefix=right_robot_arm.modelname + '/',
-    #              frame=right_robot_arm_attachment_frame)
-
-    # Left robot hand (Inspire RH56DFTP)
-    left_robot_hand_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'inspire_rh56dftp_left', 'rh56dftp_left.xml')
+    left_robot_hand_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'wonik_allegro', 'left_hand.xml')
     left_robot_hand = mujoco.MjSpec.from_file(left_robot_hand_xml_path)
     left_adaptor = left_robot_arm.body('link7').add_body(name='adaptor',
                                                          pos=[0, 0, 0.01])
     left_adaptor.add_geom(type=mujoco.mjtGeom.mjGEOM_CYLINDER,
-                          size=[0.042, 0.005, 0], # TODO: 3번째 값은 필요 없음 (mujoco 오류?)
+                          size=[0.03773072, 0.005, 0], # TODO: 3번째 값은 필요 없음 (mujoco 오류?)
                           rgba=[0.2, 0.2, 0.2, 1],
                           pos=[0, 0, -0.005])
-    left_robot_hand_attachment_frame = left_adaptor.add_frame()
+    left_robot_hand_attachment_frame = left_adaptor.add_frame(pos=[0, 0, 0.095],
+                                                              euler=[0, -np.pi/2, 0])
     left_robot_arm.attach(child=left_robot_hand,
                           prefix=left_robot_hand.modelname + '/',
                           frame=left_robot_hand_attachment_frame)
     scene.attach(child=left_robot_arm,
                  prefix=left_robot_arm.modelname + '/',
                  frame=left_robot_arm_attachment_frame)
-
-    # Right robot hand (Inspire RH56DFTP4)
-    right_robot_hand_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'inspire_rh56dftp_right', 'rh56dftp_right.xml')
+    
+    # Right robot hand (Allegro Hand V4)
+    right_robot_hand_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'wonik_allegro', 'right_hand.xml')
     right_robot_hand = mujoco.MjSpec.from_file(right_robot_hand_xml_path)
     right_adaptor = right_robot_arm.body('link7').add_body(name='adaptor',
                                                            pos=[0, 0, 0.01])
     right_adaptor.add_geom(type=mujoco.mjtGeom.mjGEOM_CYLINDER,
-                           size=[0.042, 0.005, 0], # TODO: 3번째 값은 필요 없음 (mujoco 오류?)
+                           size=[0.03773072, 0.005, 0], # TODO: 3번째 값은 필요 없음 (mujoco 오류?)
                            rgba=[0.2, 0.2, 0.2, 1],
                            pos=[0, 0, -0.005])
-    right_robot_hand_attachment_frame = right_adaptor.add_frame()
+    right_robot_hand_attachment_frame = right_adaptor.add_frame(pos=[0, 0, 0.095],
+                                                                euler=[0, -np.pi/2, 0])
     right_robot_arm.attach(child=right_robot_hand,
                            prefix=right_robot_hand.modelname + '/',
                            frame=right_robot_hand_attachment_frame)
     scene.attach(child=right_robot_arm,
                  prefix=right_robot_arm.modelname + '/',
                  frame=right_robot_arm_attachment_frame)
+
+    # Left robot hand (Inspire RH56DFTP)
+    # left_robot_hand_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'inspire_rh56dftp_left', 'rh56dftp_left.xml')
+    # left_robot_hand = mujoco.MjSpec.from_file(left_robot_hand_xml_path)
+    # left_adaptor = left_robot_arm.body('link7').add_body(name='adaptor',
+    #                                                      pos=[0, 0, 0.01])
+    # left_adaptor.add_geom(type=mujoco.mjtGeom.mjGEOM_CYLINDER,
+    #                       size=[0.042, 0.005, 0], # TODO: 3번째 값은 필요 없음 (mujoco 오류?)
+    #                       rgba=[0.2, 0.2, 0.2, 1],
+    #                       pos=[0, 0, -0.005])
+    # left_robot_hand_attachment_frame = left_adaptor.add_frame()
+    # left_robot_arm.attach(child=left_robot_hand,
+    #                       prefix=left_robot_hand.modelname + '/',
+    #                       frame=left_robot_hand_attachment_frame)
+    # scene.attach(child=left_robot_arm,
+    #              prefix=left_robot_arm.modelname + '/',
+    #              frame=left_robot_arm_attachment_frame)
+
+    # Right robot hand (Inspire RH56DFTP4)
+    # right_robot_hand_xml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'inspire_rh56dftp_right', 'rh56dftp_right.xml')
+    # right_robot_hand = mujoco.MjSpec.from_file(right_robot_hand_xml_path)
+    # right_adaptor = right_robot_arm.body('link7').add_body(name='adaptor',
+    #                                                        pos=[0, 0, 0.01])
+    # right_adaptor.add_geom(type=mujoco.mjtGeom.mjGEOM_CYLINDER,
+    #                        size=[0.042, 0.005, 0], # TODO: 3번째 값은 필요 없음 (mujoco 오류?)
+    #                        rgba=[0.2, 0.2, 0.2, 1],
+    #                        pos=[0, 0, -0.005])
+    # right_robot_hand_attachment_frame = right_adaptor.add_frame()
+    # right_robot_arm.attach(child=right_robot_hand,
+    #                        prefix=right_robot_hand.modelname + '/',
+    #                        frame=right_robot_hand_attachment_frame)
+    # scene.attach(child=right_robot_arm,
+    #              prefix=right_robot_arm.modelname + '/',
+    #              frame=right_robot_arm_attachment_frame)
 
     # Box
     box_width = 0.34
@@ -178,43 +178,43 @@ def load():
                      frame=ycb_object_attachment_frame)
         
     # Initial state (Allegro Hand V4)
-    # initial_qpos = (
-    #     [0, 0, 0, np.pi/6, np.pi, 0, np.pi] # left arm
-    #     + [0, 1.6, 1.3, 0.5, 0, 1.6, 1.3, 0.5, 0, 1.6, 1.3, 0.5, 0, 1.1, 1.1, 0.5] # left hand
-    #     + [0, 0, 0, np.pi/6, 0, 0, -np.pi/2] # right arm
-    #     + [0]*16 # right hand
-    #     + [-0.112, 0.312, 0.516, 0.417242, 0.264029, 0.483108, 0.723052] # barcode scanner
-    #     + [0.517, 0.253, 0.112, 0.707107, 0, 0, 0.707107] # 003_cracker_box
-    #     + [0.442, 0.340, 0.092, 0.707107, 0, 0, 0.707107] # 004_sugar_box
-    #     + [0.549, 0.334, 0.058, 0.707107, 0, 0, 0.707107] # 005_tomato_soup_can
-    #     + [0.543, 0.472, 0.085, 0.707107, 0, 0, 0.707107] # 006_mustard_bottle
-    #     + [0.542, 0.403, 0.048, 0.707107, 0, 0, 0.707107] # 010_potted_meat_can
-    #     + [0.423, 0.465, 0.110, 0.707107, 0, 0, 0.707107] # 021_bleach_cleanser
-    # )
-    # initial_ctrl = initial_qpos[:46]
-    # scene.add_key(name='initial_state', qpos=initial_qpos, ctrl=initial_ctrl)
+    initial_qpos = (
+        [0, 0, 0, np.pi/6, np.pi, 0, np.pi] # left arm
+        + [0, 1.6, 1.3, 0.5, 0, 1.6, 1.3, 0.5, 0, 1.6, 1.3, 0.5, 0, 1.1, 1.1, 0.5] # left hand
+        + [0, 0, 0, np.pi/6, 0, 0, -np.pi/2] # right arm
+        + [0]*16 # right hand
+        + [-0.112, 0.312, 0.516, 0.417242, 0.264029, 0.483108, 0.723052] # barcode scanner
+        + [0.517, 0.253, 0.112, 0.707107, 0, 0, 0.707107] # 003_cracker_box
+        + [0.442, 0.340, 0.092, 0.707107, 0, 0, 0.707107] # 004_sugar_box
+        + [0.549, 0.334, 0.058, 0.707107, 0, 0, 0.707107] # 005_tomato_soup_can
+        + [0.543, 0.472, 0.085, 0.707107, 0, 0, 0.707107] # 006_mustard_bottle
+        + [0.542, 0.403, 0.048, 0.707107, 0, 0, 0.707107] # 010_potted_meat_can
+        + [0.423, 0.465, 0.110, 0.707107, 0, 0, 0.707107] # 021_bleach_cleanser
+    )
+    initial_ctrl = initial_qpos[:46]
+    scene.add_key(name='initial_state', qpos=initial_qpos, ctrl=initial_ctrl)
 
     # Initial state (Inspire RH56DFTP)
-    initial_qpos = (
-        [0, 0, 0, np.pi/6, 0, 0, np.pi/2] # left arm
-        + [1.1624, 0, 0, 0, 1.25, 1.35, 1.25, 1.35, 1.25, 1.35, 1.25, 1.35] # left hand
-        + [0, 0, 0, np.pi/6, 0, 0, 0] # right arm
-        + [0]*12 # right hand
-        + [-0.14742, 0.484668, 0.496348, 0.411075, 0.231993, 0.544672, 0.693202] # barcode scanner
-        + [-0.203, 0.353, 0.112, 0.707107, 0, 0, 0.707107] # 003_cracker_box
-        + [-0.278, 0.440, 0.092, 0.707107, 0, 0, 0.707107] # 004_sugar_box
-        + [-0.171, 0.434, 0.058, 0.707107, 0, 0, 0.707107] # 005_tomato_soup_can
-        + [-0.177, 0.572, 0.085, 0.707107, 0, 0, 0.707107] # 006_mustard_bottle
-        + [-0.178, 0.503, 0.048, 0.707107, 0, 0, 0.707107] # 010_potted_meat_can
-        + [-0.297, 0.565, 0.110, 0.707107, 0, 0, 0.707107] # 021_bleach_cleanser
-    )
-    initial_ctrl = (
-        [0, 0, 0, np.pi/6, 0, 0, np.pi/2] # left arm
-        + [1.1624, 0, 1.4244, 1.4244, 1.4244, 1.4244] # left hand
-        + [0, 0, 0, np.pi/6, 0, 0, 0] # right arm
-        + [0, 0, 0, 0, 0, 0] # right hand
-    )
-    scene.add_key(name='initial_state', qpos=initial_qpos, ctrl=initial_ctrl)
+    # initial_qpos = (
+    #     [0, 0, 0, np.pi/6, 0, 0, np.pi/2] # left arm
+    #     + [1.1624, 0, 0, 0, 1.25, 1.35, 1.25, 1.35, 1.25, 1.35, 1.25, 1.35] # left hand
+    #     + [0, 0, 0, np.pi/6, 0, 0, 0] # right arm
+    #     + [0]*12 # right hand
+    #     + [-0.14742, 0.484668, 0.496348, 0.411075, 0.231993, 0.544672, 0.693202] # barcode scanner
+    #     + [-0.203, 0.353, 0.112, 0.707107, 0, 0, 0.707107] # 003_cracker_box
+    #     + [-0.278, 0.440, 0.092, 0.707107, 0, 0, 0.707107] # 004_sugar_box
+    #     + [-0.171, 0.434, 0.058, 0.707107, 0, 0, 0.707107] # 005_tomato_soup_can
+    #     + [-0.177, 0.572, 0.085, 0.707107, 0, 0, 0.707107] # 006_mustard_bottle
+    #     + [-0.178, 0.503, 0.048, 0.707107, 0, 0, 0.707107] # 010_potted_meat_can
+    #     + [-0.297, 0.565, 0.110, 0.707107, 0, 0, 0.707107] # 021_bleach_cleanser
+    # )
+    # initial_ctrl = (
+    #     [0, 0, 0, np.pi/6, 0, 0, np.pi/2] # left arm
+    #     + [1.1624, 0, 1.4244, 1.4244, 1.4244, 1.4244] # left hand
+    #     + [0, 0, 0, np.pi/6, 0, 0, 0] # right arm
+    #     + [0, 0, 0, 0, 0, 0] # right hand
+    # )
+    # scene.add_key(name='initial_state', qpos=initial_qpos, ctrl=initial_ctrl)
 
     scene.compile()
 
