@@ -11,9 +11,8 @@ It provides:
 
 ## Installation
 
-This implementation requires the following dependencies (tested on Windows 11):
+This implementation requires the following dependencies (tested with python 3.12, on Windows 11):
 
-* Python >= 3.9
 * [MuJoCo](https://mujoco.org/) >= 3.3.3
 * [imageio](https://imageio.readthedocs.io/) >= 2.37.0
 * [Matplotlib](https://matplotlib.org/) >= 3.10.6
