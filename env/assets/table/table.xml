@@ -7,7 +7,7 @@
 
   <worldbody>
     <body name="table">
-      <geom type="mesh" mesh="table" rgba="1 1 1 1"/>
+      <geom type="mesh" mesh="table" rgba="0.75 0.75 0.75 1"/>
     </body>
   </worldbody>
 </mujoco>

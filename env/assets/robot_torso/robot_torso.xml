@@ -29,7 +29,7 @@
   
   <worldbody>
     <body name="robot_torso">
-      <geom mesh="robot_torso" class="visual" rgba="0.2 0.2 0.2 1"/>
+      <geom mesh="robot_torso" class="visual" rgba="0.65 0.65 0.65 1"/>
       <geom mesh="robot_torso_collision_0" rgba="0.8103332942861998 0.7481487387682506 0.8892550295065081 1" class="collision"/>
       <geom mesh="robot_torso_collision_1" rgba="0.42501763116778013 0.9927101710382816 0.6068340743022467 1" class="collision"/>
       <geom mesh="robot_torso_collision_2" rgba="0.05180378066866642 0.6382212889967489 0.2816548239377977 1" class="collision"/>

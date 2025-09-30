@@ -219,6 +219,6 @@ def load():
     scene.compile()
 
     # For debugging
-    scene.to_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dual_arm_mjcf.xml'))
+    # scene.to_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dual_arm_mjcf.xml'))
 
     return scene

@@ -61,8 +61,6 @@ class DualArmEnv:
         
         observation = self.get_observation()
 
-        # self.right_robot_arm.set_tcp_pose([0.2, 0.4, 0.4, 0.7071068, -0.7071068, 0, 0])
-
         if self.save_video:
             if self.writer is not None:
                 self.writer.close()
