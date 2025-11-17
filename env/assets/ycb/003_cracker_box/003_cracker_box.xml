@@ -6,7 +6,8 @@
       <geom group="2" type="mesh" contype="0" conaffinity="0"/>
     </default>
     <default class="collision">
-      <geom group="3" type="mesh" condim="6"  priority="1" mass="0" solref="0.002 1"/>
+      <!-- <geom group="3" type="mesh" condim="6"  priority="1" mass="0" solref="0.002 1"/> -->
+      <geom group="3" type="mesh" condim="6"  priority="1" mass="0" solref="0.01 1"/>
     </default>
   </default>
   
@@ -24,7 +25,7 @@
       <geom name="003_cracker_box" material="material_0" mesh="003_cracker_box" class="visual" mass="0.411"/>
       <!-- <geom mesh="003_cracker_box_collision_0" rgba="0.24910084134453225 0.9291914559901291 0.6519096107112041 1" class="collision"/>
       <geom mesh="003_cracker_box_collision_1" rgba="0.5418364141387485 0.39192333775571686 0.25200063707229703 1" class="collision"/> -->
-      <geom name="003_cracker_box_collision_0" mesh="003_cracker_box" class="collision"/>
+      <geom name="003_cracker_box_collision_0" mesh="003_cracker_box" class="collision" />
       <site name="barcode" group="4" rgba="1 0 0 1" pos="-0.010259 0.050995 -0.10498" quat="0 0.707107 0.707107 0"/>
     </body>
   </worldbody>

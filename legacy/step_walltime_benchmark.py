@@ -17,7 +17,8 @@ niter_list = []
 
 for _ in range(1000):
     t0 = time.perf_counter()
-    env.step()
+    action = [4, 24, 7]
+    env.step(action)
     dt_list.append(time.perf_counter() - t0)
     ncon_list.append(int(env.data.ncon))
     nefc_list.append(int(env.data.nefc))
