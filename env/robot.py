@@ -54,7 +54,11 @@ class RobotArmBase:
         self.set_q_pos(ik_result["qpos"])
 
     def servoj(self, target_q_pos):
-        self.data.ctrl[self.actuator_ids] = target_q_pos
+        ik_result = self.qpos_from_site_pose(
+            target_pos=target_q_pos[:3], target_quat=target_q_pos[3:]
+        )
+        q_pos = ik_result["qpos"]
+        self.data.ctrl[self.actuator_ids] = q_pos
         self.data.qfrc_applied[self.joint_dof_adr] = self.data.qfrc_bias[
             self.joint_dof_adr
         ]
