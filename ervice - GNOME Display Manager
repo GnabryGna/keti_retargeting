@@ -1,0 +1,17 @@
+[0;1;32m●[0m gdm.service - GNOME Display Manager
+     Loaded: loaded (/lib/systemd/system/gdm.service; static)
+     Active: [0;1;32mactive (running)[0m since Mon 2025-11-24 20:39:29 KST; 5min ago
+   Main PID: 1336 (gdm3)
+      Tasks: 3 (limit: 76783)
+     Memory: 7.0M
+        CPU: 140ms
+     CGroup: /system.slice/gdm.service
+             └─1336 /usr/sbin/gdm3
+
+11월 24 20:39:25 ge-MS-7D96 systemd[1]: Starting GNOME Display Manager...
+11월 24 20:39:29 ge-MS-7D96 systemd[1]: Started GNOME Display Manager.
+11월 24 20:39:30 ge-MS-7D96 gdm-launch-environment][1359]: pam_unix(gdm-launch-environment:session): session opened for user gdm(uid=128) by (uid=0)
+11월 24 20:41:00 ge-MS-7D96 gdm-password][3846]: [0;1;31m[0;1;39m[0;1;31mgkr-pam: unable to locate daemon control file[0m
+11월 24 20:41:00 ge-MS-7D96 gdm-password][3846]: gkr-pam: stashed password to try later in open session
+11월 24 20:41:00 ge-MS-7D96 gdm-password][3846]: pam_unix(gdm-password:session): session opened for user ge(uid=1000) by (uid=0)
+11월 24 20:41:00 ge-MS-7D96 gdm-password][3846]: gkr-pam: unlocked login keyring

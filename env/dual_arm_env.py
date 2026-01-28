@@ -94,15 +94,15 @@ class DualArmEnv:
         return observation
 
     def step(self, action):
-        self.left_robot_arm.set_tcp_pose(action["left_wrist_qpos"])
-        self.right_robot_arm.set_tcp_pose(action["right_wrist_qpos"])
+        # self.left_robot_arm.set_tcp_pose(action["left_wrist_qpos"])
+        # self.right_robot_arm.set_tcp_pose(action["right_wrist_qpos"])
 
-        # self.left_robot_arm.servoj(action['left_robot_arm_q_pos'])
-        # self.right_robot_arm.servoj(action['right_robot_arm_q_pos'])
-        self.left_robot_hand.servoj(action["left_robot_hand_qpos"])
-        self.right_robot_hand.servoj(action["right_robot_hand_qpos"])
-        mujoco.mj_step(self.model, self.data, nstep=10)  # 1/(0.001*10) = 100Hz
+        self.left_robot_arm.servoj(action["left_wrist_qpos"])
+        self.right_robot_arm.servoj(action["right_wrist_qpos"])
+        self.left_robot_hand.servoj(action["left_hand_qpos"])
+        self.right_robot_hand.servoj(action["right_hand_qpos"])
         observation = self.get_observation()
+        mujoco.mj_step(self.model, self.data, nstep=10)  # 1/(0.001*10) = 100Hz
         reward = self.get_reward()
 
         if self.save_video:
