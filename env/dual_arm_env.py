@@ -15,11 +15,11 @@ from env.robot import xArm7
 class DualArmEnv:
     BARCODE_SCANNER_NAME = "barcode_scanner/barcode_scanner"
     YCB_OBJECT_NAMES = [
-        "003_cracker_box/003_cracker_box",
-        "004_sugar_box/004_sugar_box",
-        "005_tomato_soup_can/005_tomato_soup_can",
+        # "003_cracker_box/003_cracker_box",
+        # "004_sugar_box/004_sugar_box",
+        # "005_tomato_soup_can/005_tomato_soup_can",
         "006_mustard_bottle/006_mustard_bottle",
-        "010_potted_meat_can/010_potted_meat_can",
+        # "010_potted_meat_can/010_potted_meat_can",
         "021_bleach_cleanser/021_bleach_cleanser",
     ]
 
@@ -68,6 +68,17 @@ class DualArmEnv:
             height = self.model.vis.global_.offheight
             self.renderer = mujoco.Renderer(self.model, width=width, height=height)
 
+        # Track if any object has passed the z threshold
+        self.has_object_passed_threshold = False
+        self.scan_touch_reward_given = np.zeros(
+            len(self.ycb_object_body_ids), dtype=bool
+        )
+        self.target_ycb_x = None
+        self.target_ycb_z = None
+        self.target_index = None
+        # Axis length for coordinate visualization
+        self.axis_length = 0.1  # 10cm axes
+
     def reset(self):
         initial_sate = self.model.key("initial_state").id
         mujoco.mj_resetDataKeyframe(self.model, self.data, initial_sate)
@@ -75,6 +86,14 @@ class DualArmEnv:
         self.spawn_ycb_object()
         mujoco.mj_step(self.model, self.data, nstep=10000)  # 10s
 
+        # Reset threshold flag
+        self.has_object_passed_threshold = False
+        self.scan_touch_reward_given = np.zeros(
+            len(self.ycb_object_body_ids), dtype=bool
+        )
+        self.target_ycb_x = None
+        self.target_ycb_z = None
+        self.target_index = None
         observation = self.get_observation()
 
         if self.save_video:
@@ -102,9 +121,12 @@ class DualArmEnv:
         self.left_robot_hand.servoj(action["left_hand_qpos"])
         self.right_robot_hand.servoj(action["right_hand_qpos"])
         observation = self.get_observation()
+        # for objects in observation["ycb_object_poses"]:
+        #     print("ycb pose : ", objects[:3])
         mujoco.mj_step(self.model, self.data, nstep=10)  # 1/(0.001*10) = 100Hz
         reward = self.get_reward()
-
+        if reward != -1.0:
+            print("reward : ", reward)
         if self.save_video:
             if self.data.time >= self.next_frame_time:
                 self.renderer.update_scene(self.data)
@@ -145,7 +167,126 @@ class DualArmEnv:
         }
 
     def get_reward(self):
-        return None
+        # Get barcode scanner position and z-axis direction
+        scanner_pos = self.data.xpos[self.barcode_scanner_body_id].copy()
+        scanner_quat = self.data.xquat[self.barcode_scanner_body_id].copy()
+
+        # Calculate z-axis direction in world frame
+        ez_local = np.array([0.0, 0.0, 1.0], dtype=np.float64)
+        z_axis_world = np.zeros(3, dtype=np.float64)
+        mujoco.mju_rotVecQuat(z_axis_world, ez_local, scanner_quat)
+        z_axis_world = z_axis_world / np.linalg.norm(z_axis_world)
+
+        # Define z-axis line segment: from scanner_pos to scanner_pos + 0.25 * z_axis
+        z_axis_length = 0.25
+        z_axis_end = scanner_pos + z_axis_length * z_axis_world
+
+        # Check all YCB objects
+        if not self.has_object_passed_threshold:
+            for i, ycb_object_body_id in enumerate(self.ycb_object_body_ids):
+                # Skip already scanned objects
+                if self.scan_touch_reward_given[i]:
+                    continue
+                
+                obj_pos = self.data.xpos[ycb_object_body_id].copy()
+                x_pos = obj_pos[0]  # x coordinate (index 0)
+                z_pos = obj_pos[2]  # z coordinate (index 2)
+                if z_pos > 0.3 and not self.has_object_passed_threshold:
+                    self.target_ycb_x = x_pos
+                    self.target_ycb_z = z_pos
+                    self.target_index = i
+                    break
+        
+        # Update target object's current position on every step
+        if self.target_index is not None:
+            ycb_object_body_id = self.ycb_object_body_ids[self.target_index]
+            obj_pos = self.data.xpos[ycb_object_body_id].copy()
+            self.target_ycb_x = obj_pos[0]
+            self.target_ycb_z = obj_pos[2]
+        
+        if self.target_ycb_x is not None or self.target_ycb_z is not None and self.target_index is not None:
+            # Condition 1: z position > 0.3 (first success - pick up object)
+            if self.target_ycb_z > 0.3 and not self.has_object_passed_threshold:
+                self.has_object_passed_threshold = True
+                return 0.0
+
+            # Condition 3: Object touches barcode scanner z-axis (0.25 length) AND z_pos >= 0.3
+            if (self.target_ycb_z >= 0.3) and (
+                not self.scan_touch_reward_given[self.target_index]
+            ):
+
+                # 선분 endpoints
+                p0 = scanner_pos
+                p1 = z_axis_end
+                v = p1 - p0
+                vv = float(np.dot(v, v)) + 1e-12  # divide-by-zero 방지
+
+                # 이 body에 속한 geom들 전부 검사 (표면 기준 접촉 판정)
+                # 실제 body id 가져오기 (target_index는 리스트 위치, body_id는 MuJoCo 인덱스)
+                ycb_body_id = self.ycb_object_body_ids[self.target_index]
+                gadr = self.model.body_geomadr[ycb_body_id]
+                gnum = self.model.body_geomnum[ycb_body_id]
+
+                # z축(blue) 자체의 두께(너가 그린 triad 캡슐 radius랑 맞추면 좋음)
+                axis_radius = 0.004  # 예: triad 그릴 때 radius=0.004 썼다면 동일하게
+
+                for gid in range(gadr, gadr + gnum):
+                    # geom 중심(world)
+                    cg = self.data.geom_xpos[gid].copy()
+
+                    # 선분-점 최소거리(선분으로 clamp)
+                    w = cg - p0
+                    t = float(np.dot(w, v) / vv)
+                    t = max(0.0, min(1.0, t))
+                    closest = p0 + t * v
+                    dist = float(np.linalg.norm(cg - closest))
+
+                    # geom "대략 반경" 계산 (shape별로 다름)
+                    gtype = int(self.model.geom_type[gid])
+                    size = self.model.geom_size[gid].copy()
+
+                    # MuJoCo geom_size 의미(대표):
+                    # sphere: [r,0,0], capsule: [r, halfLength, 0], cylinder: [r, halfLength, 0], box: [hx,hy,hz]
+                    if gtype == int(mujoco.mjtGeom.mjGEOM_SPHERE):
+                        r_geom = float(size[0])
+                    elif gtype in (
+                        int(mujoco.mjtGeom.mjGEOM_CAPSULE),
+                        int(mujoco.mjtGeom.mjGEOM_CYLINDER),
+                    ):
+                        r_geom = float(size[0])
+                    elif gtype == int(mujoco.mjtGeom.mjGEOM_BOX):
+                        # box는 half-extent라서 대각 반경을 사용
+                        r_geom = float(np.linalg.norm(size[:3]))
+                    else:
+                        # mesh 등은 대충 안전하게 좀 크게(또는 0.05 같은 상수) 잡는게 현실적
+                        r_geom = 0.05
+
+                    # "닿음" 판정: 중심-선분 거리 <= (geom반경 + 축반경 + 여유)
+                    margin = 0.015  # 15mm 여유로 증가 (감지 거리 확대)
+                    if dist <= (r_geom + axis_radius + margin):
+                        self.scan_touch_reward_given[self.target_index] = True
+                        return 0.0
+
+            # Condition 2: x position < -0.2 AND z position < 0.3 (second success - place in box)
+            if (
+                self.target_ycb_x < -0.2
+                and self.target_ycb_z < 0.3
+                and self.has_object_passed_threshold
+            ):
+                self.has_object_passed_threshold = False
+                self.target_ycb_x = None
+                self.target_ycb_z = None
+                self.target_index = None
+                return 0.0
+
+            # Drop penalty: object fell (but only if scan not completed)
+            if self.target_ycb_z < 0.2 and self.has_object_passed_threshold:
+                # Don't penalize if scan already completed (placing in box)
+                if not self.scan_touch_reward_given[self.target_index]:
+                    self.has_object_passed_threshold = False
+                    return -2.0
+
+        return -1.0
 
     def spawn_ycb_object(self):
         nonoverlap_pos_dict = self.sample_nonoverlap_pos(
@@ -208,7 +349,16 @@ class DualArmEnv:
                         break
 
                 if not overlap:
-                    z = z_dict[name]
+                    # Ensure object spawns on table surface
+                    # z_dict[name] is the half-height of the object
+                    # Table surface is at grasping_area_pos[2] = 0
+                    # So object center should be at z = table_height + object_half_height
+                    table_height = self.grasping_area_pos[2]  # Should be 0
+                    object_half_height = z_dict[name]
+                    z = table_height + object_half_height
+
+                    # Additional check: ensure position is within grasping area bounds
+                    # (x, y) is already constrained, but double-check z
                     nonoverlap_pos_dict[name] = np.array(
                         [xy_pos_candidate[0], xy_pos_candidate[1], z]
                     )
@@ -221,6 +371,71 @@ class DualArmEnv:
         return nonoverlap_pos_dict
 
     # def set_state():
+
+    def add_triad(self, viewer, length=0.25, radius=0.003, z_length=0.25):
+        """
+        viewer.user_scn 에 (pos, quat) 기준의 3축 선/캡슐을 추가.
+        quat은 MuJoCo 포맷(w, x, y, z).
+        z_length: z축의 길이 (기본값 0.25m)
+        """
+        pos = self.data.xpos[self.barcode_scanner_body_id].copy()
+        quat_wxyz = self.data.xquat[self.barcode_scanner_body_id].copy()
+        # 매 프레임 누적 방지: user_scn의 geoms를 리셋
+        viewer.user_scn.ngeom = 0
+
+        # 로컬 좌표축 단위벡터
+        ex = np.array([1.0, 0.0, 0.0], dtype=np.float64)
+        ey = np.array([0.0, 1.0, 0.0], dtype=np.float64)
+        ez = np.array([0.0, 0.0, 1.0], dtype=np.float64)
+
+        # quat로 축 회전: mju_rotVecQuat(out, vec, quat)
+        q = np.asarray(quat_wxyz, dtype=np.float64)
+        rx = np.zeros(3)
+        ry = np.zeros(3)
+        rz = np.zeros(3)
+        mujoco.mju_rotVecQuat(rx, ex, q)
+        mujoco.mju_rotVecQuat(ry, ey, q)
+        mujoco.mju_rotVecQuat(rz, ez, q)
+
+        p0 = np.asarray(pos, dtype=np.float64)
+        p1x = p0 + length * rx
+        p1y = p0 + length * ry
+        p1z = p0 + z_length * rz  # z축만 0.25 길이로 설정
+
+        # 커스텀 geom 하나 추가하는 헬퍼
+        def _add_segment(pa, pb, rgba):
+            g = viewer.user_scn.geoms[viewer.user_scn.ngeom]
+            viewer.user_scn.ngeom += 1
+
+            # "connector" 타입: 두 점을 잇는 캡슐/실린더/화살표 등을 만들어줌
+            mujoco.mjv_initGeom(
+                g,
+                type=mujoco.mjtGeom.mjGEOM_CAPSULE,
+                size=np.array([0.0, 0.0, 0.0], dtype=np.float64),
+                pos=np.array([0.0, 0.0, 0.0], dtype=np.float64),
+                mat=np.eye(3, dtype=np.float64).reshape(-1),
+                rgba=np.array([1.0, 1.0, 1.0, 1.0], dtype=np.float32),
+            )
+
+            # 2) from-to 커넥터 설정 (mjv_makeConnector 대신 mjv_connector)  [oai_citation:3‡mujoco.readthedocs.io](https://mujoco.readthedocs.io/en/2.3.7/APIreference/APIfunctions.html?utm_source=chatgpt.com)
+            mujoco.mjv_connector(
+                g,
+                type=mujoco.mjtGeom.mjGEOM_CAPSULE,
+                width=radius,
+                from_=np.asarray(pa, dtype=np.float64),
+                to=np.asarray(pb, dtype=np.float64),
+            )
+
+            # 3) 색 지정
+            g.rgba[:] = rgba
+
+        # x/y/z 축: 색은 취향대로 (RGBA)
+        _add_segment(p0, p1x, np.array([1.0, 0.2, 0.2, 1.0]))  # x
+        _add_segment(p0, p1y, np.array([0.2, 1.0, 0.2, 1.0]))  # y
+        _add_segment(p0, p1z, np.array([0.2, 0.2, 1.0, 1.0]))  # z
+
+        # viewer에 반영
+        viewer.sync()
 
     def close(self):
         if self.save_video:
