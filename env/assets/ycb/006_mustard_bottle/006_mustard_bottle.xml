@@ -1,12 +1,12 @@
 <mujoco model="006_mustard_bottle">
   <compiler meshdir="assets" texturedir="assets"/>
-  
+
   <default>
     <default class="visual">
-      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+      <geom group="2" type="mesh" contype="0" conaffinity="0" mass="0"/>
     </default>
     <default class="collision">
-      <geom group="3" type="mesh" condim="6"  priority="1" mass="0" solref="0.002 1"/>
+      <geom group="3" type="mesh" condim="6" priority="1" solref="0.01 2" solimp="0.99 0.999 0.001 0.5 1"/>
     </default>
   </default>
   
@@ -20,12 +20,13 @@
   </asset>
   
   <worldbody>
-    <body name="006_mustard_bottle">
-      <joint name="006_mustard_bottle" type='free' damping="0.01"/>
-      <geom name="006_mustard_bottle" material="material_0" mesh="006_mustard_bottle" class="visual" mass="0.603"/>
-      <geom mesh="006_mustard_bottle_collision_0" rgba="0.3882097490163361 0.5765411576247772 0.31938714099354504 1" class="collision"/>
-      <geom mesh="006_mustard_bottle_collision_1" rgba="0.5666407331425302 0.28205737852735036 0.22597202828533347 1" class="collision"/>
-      <geom mesh="006_mustard_bottle_collision_2" rgba="0.6897937056056422 0.6018823898456783 0.2989826239550134 1" class="collision"/>
+    <body name="body">
+      <inertial pos="0 0 0" mass="0.603" diaginertia="0.00165003 0.00144161 0.00042077"/>
+      <joint name="joint" type='free' damping="0.005"/>
+      <geom name="visual_geom" material="material_0" mesh="006_mustard_bottle" class="visual"/>
+      <geom name="collision_geom_0" mesh="006_mustard_bottle_collision_0" rgba="0.3882097490163361 0.5765411576247772 0.31938714099354504 1" class="collision"/>
+      <geom name="collision_geom_1" mesh="006_mustard_bottle_collision_1" rgba="0.5666407331425302 0.28205737852735036 0.22597202828533347 1" class="collision"/>
+      <geom name="collision_geom_2" mesh="006_mustard_bottle_collision_2" rgba="0.6897937056056422 0.6018823898456783 0.2989826239550134 1" class="collision"/>
       <site name="barcode" group="4" rgba="1 0 0 1" pos="-0.026312 -0.000525 -0.043586" quat="0.5 0.5 -0.5 -0.5"/>
     </body>
   </worldbody>

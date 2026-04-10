@@ -3,10 +3,10 @@
   
   <default>
     <default class="visual">
-      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+      <geom type="mesh" contype="0" conaffinity="0" group="2" mass="0"/>
     </default>
     <default class="collision">
-      <geom group="3" type="mesh" mass="0"/>
+      <geom type="mesh" group="3"/>
     </default>
   </default>
   
@@ -19,30 +19,49 @@
     <mesh file="robot_torso_collision_4.obj"/>
     <mesh file="robot_torso_collision_5.obj"/>
     <mesh file="robot_torso_collision_6.obj"/>
-    <mesh file="robot_torso_collision_7.obj"/>
-    <mesh file="robot_torso_collision_8.obj"/>
-    <mesh file="robot_torso_collision_9.obj"/>
-    <mesh file="robot_torso_collision_10.obj"/>
-    <mesh file="robot_torso_collision_11.obj"/>
-    <mesh file="robot_torso_collision_12.obj"/>
+
+    <mesh file="head_bracket.STL" scale="0.001 0.001 0.001"/>
+
+    <mesh file="d435i_0.obj"/>
+    <mesh file="d435i_1.obj"/>
+    <mesh file="d435i_2.obj"/>
+    <mesh file="d435i_3.obj"/>
+    <mesh file="d435i_4.obj"/>
+    <mesh file="d435i_5.obj"/>
+    <mesh file="d435i_6.obj"/>
+    <mesh file="d435i_7.obj"/>
+    <mesh file="d435i_8.obj"/>
   </asset>
   
   <worldbody>
-    <body name="robot_torso">
-      <geom mesh="robot_torso" class="visual" rgba="0.65 0.65 0.65 1"/>
-      <geom mesh="robot_torso_collision_0" rgba="0.8103332942861998 0.7481487387682506 0.8892550295065081 1" class="collision"/>
-      <geom mesh="robot_torso_collision_1" rgba="0.42501763116778013 0.9927101710382816 0.6068340743022467 1" class="collision"/>
-      <geom mesh="robot_torso_collision_2" rgba="0.05180378066866642 0.6382212889967489 0.2816548239377977 1" class="collision"/>
-      <geom mesh="robot_torso_collision_3" rgba="0.29538159865575575 0.5280771911740632 0.035624837349799265 1" class="collision"/>
-      <geom mesh="robot_torso_collision_4" rgba="0.41873327459518805 0.17602990595939094 0.9935237827752832 1" class="collision"/>
-      <geom mesh="robot_torso_collision_5" rgba="0.17976283839746876 0.906532457216316 0.07826303234573417 1" class="collision"/>
-      <geom mesh="robot_torso_collision_6" rgba="0.4150315528439791 0.7167348131233686 0.18585097634253822 1" class="collision"/>
-      <geom mesh="robot_torso_collision_7" rgba="0.3688237486102901 0.6435851892788423 0.8153547383966251 1" class="collision"/>
-      <geom mesh="robot_torso_collision_8" rgba="0.7628565684050346 0.817607909182518 0.8673471919797455 1" class="collision"/>
-      <geom mesh="robot_torso_collision_9" rgba="0.5863673121198987 0.06705724673963354 0.0518192476862277 1" class="collision"/>
-      <geom mesh="robot_torso_collision_10" rgba="0.8581215979610125 0.6496501116041294 0.9332185652394698 1" class="collision"/>
-      <geom mesh="robot_torso_collision_11" rgba="0.5619554818170358 0.8115604942794454 0.37711905168900417 1" class="collision"/>
-      <geom mesh="robot_torso_collision_12" rgba="0.5819459390784728 0.3821724604746257 0.8825198359571682 1" class="collision"/>
+    <body>
+      <geom mesh="robot_torso" rgba="0.65 0.65 0.65 1" class="visual"/>
+      <geom mesh="robot_torso_collision_0" rgba="0.14632037325219083 0.19155042587389148 0.7816952554521728 1" class="collision"/>
+      <geom mesh="robot_torso_collision_1" rgba="0.009250161980918215 0.7074264263638433 0.23189011997796793 1" class="collision"/>
+      <geom mesh="robot_torso_collision_2" rgba="0.2843421837375556 0.3421040643333966 0.6897320426195785 1" class="collision"/>
+      <geom mesh="robot_torso_collision_3" rgba="0.057216821984843125 0.5669375867681313 0.951467757085922 1" class="collision"/>
+      <geom mesh="robot_torso_collision_4" rgba="0.8043080324357968 0.9499769060565888 0.6359231348840233 1" class="collision"/>
+      <geom mesh="robot_torso_collision_5" rgba="0.7415806952331973 0.532902948075013 0.0037624987055410175 1" class="collision"/>
+      <geom mesh="robot_torso_collision_6" rgba="0.8495849374119239 0.3626924995834552 0.4606371055422074 1" class="collision"/>
+    </body>
+    <body pos="0 0.08 0.755" quat="0.7071068 0.7071068 0 0">
+      <geom mesh="head_bracket" rgba="0.65 0.65 0.65 1" class="visual"/>
+      <geom type="box" size="0.014 0.05 0.02" rgba="0.1 0.1 0.1 1" pos="0 0.06 0.02" class="visual"/>
+      <!-- minimal mass so MuJoCo can compute center of mass (invisible, no collision) -->
+      <geom type="sphere" size="0.001" mass="0.01" contype="0" conaffinity="0" rgba="0 0 0 0"/>
+    </body>
+    <body pos="0 0.09 0.86" quat="0 0 0.9659258 0.258819">
+      <geom mesh="d435i_0" rgba="0.035601 0.035601 0.035601 1" class="visual"/>
+      <geom mesh="d435i_1" rgba="0.287440 0.665387 0.327778 1" class="visual"/>
+      <geom mesh="d435i_2" rgba="0.799102 0.806952 0.799103 1" class="visual"/>
+      <geom mesh="d435i_3" rgba="0.035601 0.035601 0.035601 1" class="visual"/>
+      <geom mesh="d435i_4" rgba="0.296138 0.296138 0.296138 1" class="visual"/>
+      <geom mesh="d435i_5" rgba="0.070360 0.070360 0.070360 1" class="visual"/>
+      <geom mesh="d435i_6" rgba="0.070360 0.070360 0.070360 1" class="visual"/>
+      <geom mesh="d435i_7" rgba="0.087140 0.002866 0.009346 1" class="visual"/>
+      <geom mesh="d435i_8" rgba="1 1 1 1" class="visual"/>
+      <!-- minimal mass so MuJoCo can compute center of mass (invisible, no collision) -->
+      <geom type="sphere" size="0.001" mass="0.01" contype="0" conaffinity="0" rgba="0 0 0 0"/>
     </body>
   </worldbody>
 </mujoco>

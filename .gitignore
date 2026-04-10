@@ -1,5 +1,10 @@
 **/__pycache__
 **/*.pyc
 
+checkpoints/
 datasets/
 backup_ycb/
+
+images/
+visionpro_backup.py
+visionpro_test.py

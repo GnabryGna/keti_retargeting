@@ -8,7 +8,7 @@
       <geom density="800"/>
 
       <default class="visual">
-        <geom type="mesh" contype="0" conaffinity="0" group="2" material="black"/>
+        <geom type="mesh" contype="0" conaffinity="0" group="2" material="black" mass="0"/>
         <default class="palm_visual">
           <geom mesh="base_link"/>
         </default>
@@ -25,15 +25,15 @@
           <geom mesh="link_3.0"/>
         </default>
         <default class="fingertip_visual">
-          <geom pos="0 0 0.0147" material="white" mesh="digit"/>
+          <geom pos="0 0 0.0267" material="white" mesh="link_3.0_tip"/>
         </default>
         <default class="thumbtip_visual">
-          <geom pos="0 0 0.0303" material="white" mesh="digit"/>
+          <geom pos="0 0 0.0423" material="white" mesh="link_15.0_tip"/>
         </default>
       </default>
 
       <default class="collision">
-        <geom group="3" type="box" mass="0"/>
+        <geom group="3" type="box"/>
         <default class="palm_collision">
           <geom size="0.0204 0.0565 0.0475" pos="-0.0093 0 -0.0475"/>
         </default>
@@ -62,15 +62,11 @@
           </default>
         </default>
         <default class="fingertip_collision">
-          <geom type="mesh" pos="0 0 0.0147" mesh="digit"/>
+          <geom type="capsule" size="0.012 0.01" pos="0 0 0.019"/>
           <default class="thumbtip_collision">
-            <geom type="mesh" pos="0 0 0.0303" mesh="digit"/>
+            <geom type="capsule" size="0.012 0.008" pos="0 0 0.035"/>
           </default>
         </default>
-      </default>
-
-      <default class="touch_sensor">
-        <site type="ellipsoid" group="4" rgba="1 0 0 1" size="0.004 0.010 0.014" pos="0.018 0 0.031"/>
       </default>
 
       <default class="base">
@@ -106,6 +102,10 @@
         <position ctrlrange="-0.162 1.719"/>
       </default>
     </default>
+
+    <default class="tactile_sensor">
+      <site group="4" rgba="1 0 0 1"/>
+    </default>
   </default>
 
   <asset>
@@ -117,11 +117,12 @@
     <mesh file="link_1.0.stl"/>
     <mesh file="link_2.0.stl"/>
     <mesh file="link_3.0.stl"/>
+    <mesh file="link_3.0_tip.stl"/>
     <mesh file="link_12.0_right.stl"/>
     <mesh file="link_13.0.stl"/>
     <mesh file="link_14.0.stl"/>
     <mesh file="link_15.0.stl"/>
-    <mesh file="digit.obj"/>
+    <mesh file="link_15.0_tip.stl"/>
   </asset>
 
   <worldbody>
@@ -148,8 +149,12 @@
               <geom class="distal_collision"/>
               <body name="ff_tip">
                 <geom class="fingertip_visual"/>
-                <geom class="fingertip_collision"/>
-                <site name="ff_tip" class="touch_sensor"/>
+                <geom name="ff_tip" class="fingertip_collision"/>
+                <body name="ff_force_sensor">
+                  <inertial pos="0 0 0" mass="0.0001" diaginertia="0 0 0"/>
+                  <geom class="fingertip_collision"/>
+                  <site name="ff_force_sensor" class="tactile_sensor"/>
+                </body>
               </body>
             </body>
           </body>
@@ -174,8 +179,12 @@
               <geom class="distal_collision"/>
               <body name="mf_tip">
                 <geom class="fingertip_visual"/>
-                <geom class="fingertip_collision"/>
-                <site name="mf_tip" class="touch_sensor"/>
+                <geom name="mf_tip" class="fingertip_collision"/>
+                <body name="mf_force_sensor">
+                  <inertial pos="0 0 0" mass="0.0001" diaginertia="0 0 0"/>
+                  <geom class="fingertip_collision"/>
+                  <site name="mf_force_sensor" class="tactile_sensor"/>
+                </body>
               </body>
             </body>
           </body>
@@ -200,8 +209,12 @@
               <geom class="distal_collision"/>
               <body name="rf_tip">
                 <geom class="fingertip_visual"/>
-                <geom class="fingertip_collision"/>
-                <site name="rf_tip" class="touch_sensor"/>
+                <geom name="rf_tip" class="fingertip_collision"/>
+                <body name="rf_force_sensor">
+                  <inertial pos="0 0 0" mass="0.0001" diaginertia="0 0 0"/>
+                  <geom class="fingertip_collision"/>
+                  <site name="rf_force_sensor" class="tactile_sensor"/>
+                </body>
               </body>
             </body>
           </body>
@@ -226,8 +239,12 @@
               <geom class="thumb_distal_collision"/>
               <body name="th_tip">
                 <geom class="thumbtip_visual"/>
-                <geom class="thumbtip_collision"/>
-                <site name="th_tip" class="touch_sensor" pos="0.018 0 0.046"/>
+                <geom name="th_tip" class="thumbtip_collision"/>
+                <body name="th_force_sensor">
+                  <inertial pos="0 0 0" mass="0.0001" diaginertia="0 0 0"/>
+                  <geom class="fingertip_collision"/>
+                  <site name="th_force_sensor" class="tactile_sensor"/>
+                </body>
               </body>
             </body>
           </body>
@@ -245,7 +262,7 @@
   </contact>
 
   <actuator>
-    <position name="ffa0" joint="ffj0" class="base"/>
+    <!-- <position name="ffa0" joint="ffj0" class="base"/>
     <position name="ffa1" joint="ffj1" class="proximal"/>
     <position name="ffa2" joint="ffj2" class="medial"/>
     <position name="ffa3" joint="ffj3" class="distal"/>
@@ -260,13 +277,29 @@
     <position name="tha0" joint="thj0" class="thumb_base"/>
     <position name="tha1" joint="thj1" class="thumb_proximal"/>
     <position name="tha2" joint="thj2" class="thumb_medial"/>
-    <position name="tha3" joint="thj3" class="thumb_distal"/>
+    <position name="tha3" joint="thj3" class="thumb_distal"/> -->
+    <general gainprm="7.54 0 0 0 0 0 0 0 0 0" biasprm="0 -7.54 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.47 0.47" joint="ffj0" name="ffa0" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="2.11 0 0 0 0 0 0 0 0 0" biasprm="0 -2.11 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.196 1.61" joint="ffj1" name="ffa1" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="9.45 0 0 0 0 0 0 0 0 0" biasprm="0 -9.45 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.174 1.709" joint="ffj2" name="ffa2" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="4.26 0 0 0 0 0 0 0 0 0" biasprm="0 -4.26 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.227 1.618" joint="ffj3" name="ffa3" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="7.82 0 0 0 0 0 0 0 0 0" biasprm="0 -7.82 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.47 0.47" joint="mfj0" name="mfa0" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="0.56 0 0 0 0 0 0 0 0 0" biasprm="0 -0.56 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.196 1.61" joint="mfj1" name="mfa1" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="8.35 0 0 0 0 0 0 0 0 0" biasprm="0 -8.35 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.174 1.709" joint="mfj2" name="mfa2" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="1.92 0 0 0 0 0 0 0 0 0" biasprm="0 -1.92 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.227 1.618" joint="mfj3" name="mfa3" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="3.95 0 0 0 0 0 0 0 0 0" biasprm="0 -3.95 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.47 0.47" joint="rfj0" name="rfa0" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="3.00 0 0 0 0 0 0 0 0 0" biasprm="0 -3.00 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.196 1.61" joint="rfj1" name="rfa1" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="6.01 0 0 0 0 0 0 0 0 0" biasprm="0 -6.01 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.174 1.709" joint="rfj2" name="rfa2" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="7.49 0 0 0 0 0 0 0 0 0" biasprm="0 -7.49 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.227 1.618" joint="rfj3" name="rfa3" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="6.38 0 0 0 0 0 0 0 0 0" biasprm="0 -6.38 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="0.263 1.396" joint="thj0" name="tha0" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="5.97 0 0 0 0 0 0 0 0 0" biasprm="0 -5.97 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.105 1.163" joint="thj1" name="tha1" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="2.95 0 0 0 0 0 0 0 0 0" biasprm="0 -2.95 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.189 1.644" joint="thj2" name="tha2" forcerange="-0.7 0.7" forcelimited="true"/>
+    <general gainprm="7.32 0 0 0 0 0 0 0 0 0" biasprm="0 -7.32 0 0 0 0 0 0 0 0" biastype="affine" ctrllimited="true" ctrlrange="-0.162 1.719" joint="thj3" name="tha3" forcerange="-0.7 0.7" forcelimited="true"/>
   </actuator>
 
   <sensor>
-    <touch site="th_tip" name="th_tip"/>
-    <touch site="ff_tip" name="ff_tip"/>
-    <touch site="mf_tip" name="nf_tip"/>
-    <touch site="rf_tip" name="rf_tip"/>    
+    <force name="ff_tip_force" site="ff_force_sensor"/>
+    <force name="mf_tip_force" site="mf_force_sensor"/>
+    <force name="rf_tip_force" site="rf_force_sensor"/>
+    <force name="th_tip_force" site="th_force_sensor"/>
   </sensor>
 </mujoco>

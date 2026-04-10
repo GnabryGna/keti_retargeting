@@ -51,7 +51,7 @@ class FingerRetargetor(object):
         RetargetingConfig.set_default_urdf_dir(str(robot_dir))
 
         left_config_path = get_default_config_path(
-            robot_name=RobotName.allegro,
+            robot_name=RobotName.inspire,
             retargeting_type=RetargetingType.dexpilot,
             hand_type=HandType.left,
         )

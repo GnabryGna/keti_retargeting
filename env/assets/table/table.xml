@@ -6,8 +6,8 @@
   </asset>
 
   <worldbody>
-    <body name="table">
-      <geom type="mesh" mesh="table" rgba="0.75 0.75 0.75 1"/>
+    <body>
+      <geom type="mesh" rgba="0.75 0.75 0.75 1" mesh="table"/>
     </body>
   </worldbody>
 </mujoco>

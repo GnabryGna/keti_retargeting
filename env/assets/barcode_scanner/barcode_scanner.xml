@@ -3,10 +3,10 @@
 
   <default>
     <default class="visual">
-      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+      <geom group="2" type="mesh" contype="0" conaffinity="0" mass="0"/>
     </default>
     <default class="collision">
-      <geom group="3" type="mesh" condim="6" mass="0"/>
+      <geom group="3" type="mesh" condim="6" priority="1"/>
     </default>
   </default>
   
@@ -111,9 +111,10 @@
   </asset>
   
   <worldbody>
-    <body name="barcode_scanner">
-      <joint name="barcode_scanner" type='free' damping="0.001"/>
-      <geom material="material_0" mesh="barcode_scanner" class="visual" mass="0.16"/>
+    <body name="body">
+      <inertial pos="0 0 0" mass="0.16" diaginertia="3.70424271e-04 3.48558615e-04 7.90455763e-05"/>
+      <joint name="joint" type='free' damping="0.001"/>
+      <geom mesh="barcode_scanner" material="material_0" class="visual"/>
       <geom mesh="barcode_scanner_collision_0" rgba="0.19980927981823005 0.4288580357367924 0.23564255013610258 1" class="collision"/>
       <geom mesh="barcode_scanner_collision_1" rgba="0.2834961197168874 0.4891366295367552 0.9809570078447242 1" class="collision"/>
       <geom mesh="barcode_scanner_collision_2" rgba="0.45564745150660346 0.5705126172051947 0.07207734566597102 1" class="collision"/>

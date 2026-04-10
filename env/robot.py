@@ -226,178 +226,133 @@ class xArm7(RobotArmBase):
             tcp_site_name = self.TCP_SITE_NAME
 
         super().__init__(model, data, joint_names, actuator_names, tcp_site_name)
-
-
+        
 class RobotHandBase:
     def __init__(
-        self, model, data, joint_names, actuator_names, passive_joint_index=None
+        self,
+        model,
+        data,
+        joint_names: list[str],
+        actuator_names: list[str],
+        contact_geom_names: list[str],
+        prefix: str | None = None
     ):
         self.model = model
         self.data = data
-        self.joint_names = joint_names
-        self.actuator_names = actuator_names
 
-        self.joint_ids = [
-            mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, joint_name)
-            for joint_name in joint_names
-        ]
-        self.actuator_ids = [
-            mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, actuator_name)
-            for actuator_name in actuator_names
-        ]
-
-        self.joint_qpos_adr = model.jnt_qposadr[self.joint_ids]
-        self.joint_dof_adr = model.jnt_dofadr[self.joint_ids]
-
-        self.underactuated = len(joint_names) != len(actuator_names)
-        if self.underactuated:
-            self.passive_joint_index = passive_joint_index
-
-    def get_q_pos(self):
-        return self.data.qpos[self.joint_qpos_adr].copy()  # (njoint,)
-
-    def get_q_vel(self):
-        return self.data.qvel[self.joint_dof_adr].copy()  # (njoint,)
-
-    def set_q_pos(self, target_q_pos):
-        self.data.qpos[self.joint_qpos_adr] = target_q_pos
-        if self.underactuated:
-            actuator_input = np.delete(target_q_pos, self.passive_joint_index)
-            self.data.ctrl[self.actuator_ids] = actuator_input
+        if prefix:
+            self.joint_names = [f'{prefix}/{joint_name}' for joint_name in joint_names]
+            self.actuator_names = [f'{prefix}/{actuator_name}' for actuator_name in actuator_names]
+            self.contact_geom_names = [f'{prefix}/{contact_geom_name}' for contact_geom_name in contact_geom_names]
         else:
-            self.data.ctrl[self.actuator_ids] = target_q_pos
+            self.joint_names = joint_names
+            self.actuator_names = actuator_names
+            self.contact_geom_names = contact_geom_names
+
+        self.joint_ids = [mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, joint_name) for joint_name in self.joint_names]
+        self.actuator_ids = [mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, actuator_name) for actuator_name in self.actuator_names]
+        self.contact_geom_ids = [mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, fingertip_geom_name) for fingertip_geom_name in self.contact_geom_names]
+
+        self.joint_qpos_adr = self.model.jnt_qposadr[self.joint_ids]
+        self.joint_dof_adr = self.model.jnt_dofadr[self.joint_ids]
+
+    def get_control_input(self):
+        return self.data.ctrl[self.actuator_ids].copy()
+
+    def get_joint_pos(self):
+        joint_pos = self.data.qpos[self.joint_qpos_adr].copy()
+        return joint_pos
+    
+    def get_joint_vel(self):
+        return self.data.qvel[self.joint_dof_adr].copy()
+    
+    def get_actuator_force(self):
+        return self.data.actuator_force[self.actuator_ids].copy()
+    
+    def set_joint_pos(self, target_joint_pos):
+        self.data.qpos[self.joint_qpos_adr] = target_joint_pos
+        self.data.ctrl[self.actuator_ids] = target_joint_pos
         mujoco.mj_forward(self.model, self.data)
-
-    def servoj(self, target_q_pos):
-        if self.underactuated:
-            actuator_input = np.delete(target_q_pos, self.passive_joint_index)
-            self.data.ctrl[self.actuator_ids] = actuator_input
-        else:
-            self.data.ctrl[self.actuator_ids] = target_q_pos
+        self.data.qfrc_applied[self.joint_dof_adr] = self.data.qfrc_bias[self.joint_dof_adr]
+    
+    def servo_joint(self, target_joint_pos):
+        self.data.ctrl[self.actuator_ids] = target_joint_pos
+        self.data.qfrc_applied[self.joint_dof_adr] = self.data.qfrc_bias[self.joint_dof_adr]
 
 
 class AllegroHandV4(RobotHandBase):
     JOINT_NAMES = [
-        "ffj0",
-        "ffj1",
-        "ffj2",
-        "ffj3",
-        "mfj0",
-        "mfj1",
-        "mfj2",
-        "mfj3",
-        "rfj0",
-        "rfj1",
-        "rfj2",
-        "rfj3",
-        "thj0",
-        "thj1",
-        "thj2",
-        "thj3",
+        'ffj0',
+        'ffj1',
+        'ffj2',
+        'ffj3',
+        'mfj0',
+        'mfj1',
+        'mfj2',
+        'mfj3',
+        'rfj0',
+        'rfj1',
+        'rfj2',
+        'rfj3',
+        'thj0',
+        'thj1',
+        'thj2',
+        'thj3'
     ]
     ACTUATOR_NAMES = [
-        "ffa0",
-        "ffa1",
-        "ffa2",
-        "ffa3",
-        "mfa0",
-        "mfa1",
-        "mfa2",
-        "mfa3",
-        "rfa0",
-        "rfa1",
-        "rfa2",
-        "rfa3",
-        "tha0",
-        "tha1",
-        "tha2",
-        "tha3",
+        'ffa0',
+        'ffa1',
+        'ffa2',
+        'ffa3',
+        'mfa0',
+        'mfa1',
+        'mfa2',
+        'mfa3',
+        'rfa0',
+        'rfa1',
+        'rfa2',
+        'rfa3',
+        'tha0',
+        'tha1',
+        'tha2',
+        'tha3'
     ]
+    CONTACT_GEOM_NAMES = [
+        'ff_tip',
+        'mf_tip',
+        'rf_tip',
+        'th_tip'
+    ]
+    LENGTH = 0.2477
 
     def __init__(self, model, data, prefix=None):
-        if prefix:
-            joint_names = []
-            for joint_id in range(model.njnt):
-                joint_name = mujoco.mj_id2name(
-                    model, mujoco.mjtObj.mjOBJ_JOINT, joint_id
-                )
-                if (
-                    joint_name.startswith(prefix)
-                    and "/" not in joint_name[len(prefix) + 1 :]
-                ):
-                    joint_names.append(joint_name)
+        super().__init__(model, data, self.JOINT_NAMES, self.ACTUATOR_NAMES, self.CONTACT_GEOM_NAMES, prefix)
 
-            actuator_names = []
-            for actuator_id in range(model.nu):
-                actuator_name = mujoco.mj_id2name(
-                    model, mujoco.mjtObj.mjOBJ_ACTUATOR, actuator_id
-                )
-                if (
-                    actuator_name.startswith(prefix)
-                    and "/" not in actuator_name[len(prefix) + 1 :]
-                ):
-                    actuator_names.append(actuator_name)
-
-        else:
-            joint_names = self.JOINT_NAMES
-            actuator_names = self.ACTUATOR_NAMES
-
-        super().__init__(model, data, joint_names, actuator_names)
-
-
-class InspireRH56DFTP(RobotHandBase):
+class InspireRH56F1(RobotHandBase):
+    # Only actuated joints
     JOINT_NAMES = [
-        "thumb_proximal_rotation_joint",
-        "thumb_proximal_bending_joint",
-        "thumb_middle_joint",
-        "thumb_distal_joint",
-        "index_proximal_joint",
-        "index_distal_joint",
-        "middle_proximal_joint",
-        "middle_distal_joint",
-        "ring_proximal_joint",
-        "ring_distal_joint",
-        "little_proximal_joint",
-        "little_distal_joint",
+        'thumb_1_joint',
+        'thumb_2_joint',
+        'index_1_joint',
+        'middle_1_joint',
+        'ring_1_joint',
+        'little_1_joint',
     ]
     ACTUATOR_NAMES = [
-        "thumb_proximal_rotation",
-        "thumb_proximal_bending",
-        "index_proximal",
-        "middle_proximal",
-        "ring_proximal",
-        "little_proximal",
+        'thumb_1',
+        'thumb_2',
+        'index',
+        'middle',
+        'ring',
+        'little'
     ]
-    PASSIVE_JOINT_INDEX = [2, 3, 5, 7, 9, 11]
+    CONTACT_GEOM_NAMES = [
+        'thumb_4',
+        'index_2',
+        'middle_2',
+        'little_2'
+    ]
+    LENGTH = 0.1833
 
     def __init__(self, model, data, prefix=None):
-        if prefix:
-            joint_names = []
-            for joint_id in range(model.njnt):
-                joint_name = mujoco.mj_id2name(
-                    model, mujoco.mjtObj.mjOBJ_JOINT, joint_id
-                )
-                if (
-                    joint_name.startswith(prefix)
-                    and "/" not in joint_name[len(prefix) + 1 :]
-                ):
-                    joint_names.append(joint_name)
-
-            actuator_names = []
-            for actuator_id in range(model.nu):
-                actuator_name = mujoco.mj_id2name(
-                    model, mujoco.mjtObj.mjOBJ_ACTUATOR, actuator_id
-                )
-                if (
-                    actuator_name.startswith(prefix)
-                    and "/" not in actuator_name[len(prefix) + 1 :]
-                ):
-                    actuator_names.append(actuator_name)
-
-        else:
-            joint_names = self.JOINT_NAMES
-            actuator_names = self.ACTUATOR_NAMES
-
-        super().__init__(
-            model, data, joint_names, actuator_names, self.PASSIVE_JOINT_INDEX
-        )
+        super().__init__(model, data, self.JOINT_NAMES, self.ACTUATOR_NAMES, self.CONTACT_GEOM_NAMES, prefix)
